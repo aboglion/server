@@ -1,7 +1,7 @@
 up: ./init.sh
 	@echo "🚀 Starting Docker services..."
 	docker compose up -d
-	docker logs -f $(shell docker ps -q)
+	logs
 	@echo "🎉 All services started!"
 
 # עצירת כל המכולות
@@ -27,3 +27,8 @@ push:
 	git commit -m "Update code"
 	git push
 	@echo "✅ Changes pushed to GitHub."
+
+
+logs:
+	@echo "📜 Showing logs for n8n..."
+	docker logs -f $$(docker ps --filter "name=n8n" -q)
