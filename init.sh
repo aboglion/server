@@ -56,4 +56,15 @@ else
     echo "✅ SSL certs already exist."
 fi
 
+# יצירת תיקיית נתונים אם לא קיימת
+if [ ! -d "${HOME}/n8n_data" ]; then
+    echo "📂 Creating data directory...
+    mkdir -p ${HOME}/n8n_data
+    echo "✅ Data directory created."
+else
+    echo "✅ Data directory already exists."
+fi
+# מתן הרשאות לתיקיית נתונים ולתיקיית SSL
 
+echo "🔒 Setting permissions for data directory and SSL..."
+chmod -R 777 ${HOME}/n8n_data ./n8n/ssl
