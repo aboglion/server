@@ -63,5 +63,7 @@ if [ ! -d "n8n/data" ]; then
 else
     echo "📂 Data directory already exists."
 fi
-mkdir -p n8n/data && chmod 777 n8n/data
+chmod -R 777 n8n
+chmod 777 n8n/data
+
 echo "✅ Data directory is ready."
