@@ -1,8 +1,3 @@
-up: ./init.sh
-	@echo "🚀 Starting Docker services..."
-	docker compose up -d
-	logs
-	@echo "🎉 All services started!"
 
 # עצירת כל המכולות
 down:
@@ -32,3 +27,10 @@ push:
 logs:
 	@echo "📜 Showing logs for n8n..."
 	docker logs -f $$(docker ps --filter "name=n8n" -q)
+
+	
+up: ./init.sh
+	@echo "🚀 Starting Docker services..."
+	docker compose up -d
+	logs
+	@echo "🎉 All services started!"
