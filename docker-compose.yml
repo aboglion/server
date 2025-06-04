@@ -1,0 +1,41 @@
+services:
+  person_detection_api:
+    build: ./Person_Detection_API
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./Person_Detection_API/yolo11l.pt:/app/yolo11l.pt
+    environment:
+      - ENV=production
+      - FLASK_ENV=production
+      - SERVER_TYPE=gunicorn
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+
+  n8n:
+    image: n8nio/n8n:latest
+    ports:
+      - "8743:5678"
+    environment:
+      - N8N_HOST=n8n
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+      - WEBHOOK_URL=https://localhost:8743/
+      - GENERIC_TIMEZONE=Asia/Jerusalem
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - N8N_SSL_KEY=/home/node/.n8n/ssl/privkey.pem
+      - N8N_SSL_CERT=/home/node/.n8n/ssl/fullchain.pem
+    volumes:
+      - ./n8n/ssl:/home/node/.n8n/ssl
+      - ${HOME}/n8n_data:/home/node/.n8n
+    restart: unless-stopped
+
+# volumes: (commented out since we're using bind mounts only)
