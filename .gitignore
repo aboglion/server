@@ -5,5 +5,7 @@ yolo11-env
 # SSL certificates
 n8n/ssl/*
 n8n/ssl/**/*
+n8n/data/*
+n8n/data/**/*
 # Ignore N8N data in home directory
 ~/n8n_data/

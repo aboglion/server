@@ -35,7 +35,7 @@ services:
       - N8N_SSL_CERT=/home/node/.n8n/ssl/fullchain.pem
     volumes:
       - ./n8n/ssl:/home/node/.n8n/ssl
-      - ${HOME}/n8n_data:/home/node/.n8n
+      - ./n8n/data:/home/node/.n8n
     restart: unless-stopped
 
 # volumes: (commented out since we're using bind mounts only)

@@ -57,18 +57,11 @@ else
 fi
 
 # יצירת תיקיית נתונים אם לא קיימת
-if [ ! -d "${HOME}/n8n_data" ]; then
-    echo "📂 Creating data directory...
-    mkdir -p ${HOME}/n8n_data
-    echo "✅ Data directory created."
+if [ ! -d "n8n/data" ]; then
+    echo "📂 Creating data directory..."
+    mkdir -p n8n/data
 else
-    echo "✅ Data directory already exists."
+    echo "📂 Data directory already exists."
 fi
-# מתן הרשאות לתיקיית נתונים ולתיקיית SSL
-
-echo "🔒 Setting permissions for data directory and SSL..."
-chmod -R 777 ${HOME}/n8n_data ./n8n/ssl
-mkdir -p ./n8n/ssl ${HOME}/n8n_data
-sudo chown -R 1000:1000 ./n8n/ssl ${HOME}/n8n_data
-chmod -R 700 ./n8n/ssl ${HOME}/n8n_data
-echo "✅ Permissions set."
+mkdir -p n8n/data && chmod 777 n8n/data
+echo "✅ Data directory is ready."
