@@ -9,11 +9,11 @@ down:
 clean: down
 	@echo "⚠️ Removing .env and backup files..."
 	rm -f .env .env.bak
-	docker rm -f $$(docker ps -aq)
-	docker rmi -f $$(docker images -q)
+	@if [ "$$(docker ps -aq)" != "" ]; then docker rm -f $$(docker ps -aq); fi
+	@if [ "$$(docker images -q)" != "" ]; then docker rmi -f $$(docker images -q); fi
 	@echo "🗑️ Removing all volumes..."
-	docker volume rm $$(docker volume ls -q)
-	@echo "🧹 Cleaning up Docker system...
+	@if [ "$$(docker volume ls -q)" != "" ]; then docker volume rm $$(docker volume ls -q); fi
+	@echo "🧹 Cleaning up Docker system..."
 	docker system prune -f --volumes
 	@echo "🧹 Clean complete."
 
