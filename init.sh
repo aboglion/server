@@ -56,7 +56,4 @@ else
     echo "✅ SSL certs already exist."
 fi
 
-# הפעלת Docker
-echo "🚀 Starting docker-compose..."
-docker compose up -d
-echo "🎉 Done!"
+

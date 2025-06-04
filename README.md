@@ -12,7 +12,7 @@ cd SERVER
 
 2. 🧪 Run the installation script:
 
-bash run.sh
+make up
 
 The script will:
 
@@ -23,10 +23,6 @@ The script will:
     Launch the services with docker-compose up -d.
 
 3. 🧠 Load environment variables (required in your current shell):
-
-If this is the first time you are running the system or if a new encryption key was generated, run:
-
-source .n8n_env.sh
 
 This will load the N8N_ENCRYPTION_KEY into your current shell.
 🧪 Verify Encryption Key Load
