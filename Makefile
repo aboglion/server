@@ -38,5 +38,6 @@ logs:
 up: ./init.sh
 	@echo "🚀 Starting Docker services..."
 	docker compose up -d
-	logs
+	$(MAKE) logs
 	@echo "🎉 All services started!"
+
