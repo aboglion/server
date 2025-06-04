@@ -68,3 +68,7 @@ fi
 
 echo "🔒 Setting permissions for data directory and SSL..."
 chmod -R 777 ${HOME}/n8n_data ./n8n/ssl
+mkdir -p ./n8n/ssl ${HOME}/n8n_data
+sudo chown -R 1000:1000 ./n8n/ssl ${HOME}/n8n_data
+chmod -R 700 ./n8n/ssl ${HOME}/n8n_data
+echo "✅ Permissions set."
