@@ -63,10 +63,10 @@ if [ ! -d "n8n/data" ]; then
 else
     echo "📂 Data directory already exists."
 fi
-chown -R 1000:1000 n8n
-chmod -R 777 n8n
-chmod 777 n8n/data
-chmod 777 n8n/config
+sudo chown -R 1000:1000 n8n
+sudo chmod -R 777 n8n
+sudo chmod 777 n8n/data
+sudo chmod 777 n8n/config
 
 
 echo "✅ Data directory is ready."
