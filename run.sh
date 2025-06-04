@@ -1,46 +1,62 @@
 #!/bin/bash
 set -e
 
-# טען משתנה אם קיים
-load_key_if_exists() {
-    if [ -f ".n8n_env.sh" ]; then
-        echo "🔁 Found existing encryption key, exporting..."
-        return 0
-    fi
-    return 1
+ENV_FILE=".env"
+ENV_VAR_NAME="N8N_ENCRYPTION_KEY"
+
+is_valid_key() {
+    [[ "$1" =~ ^[a-f0-9]{48}$ ]]
 }
 
-# ייצר מפתח אם לא קיים
-if ! load_key_if_exists; then
-    echo "🔐 Generating random encryption key..."
-    ENCRYPTION_KEY=$(openssl rand -hex 24)
+generate_key() {
+    openssl rand -hex 24
+}
 
-    echo "📄 Creating .env file..."
-    echo "N8N_ENCRYPTION_KEY=$ENCRYPTION_KEY" > .env
+extract_key() {
+    grep "^$ENV_VAR_NAME=" "$ENV_FILE" | cut -d '=' -f2
+}
 
-    echo "📝 Saving exportable key to .n8n_env.sh"
-    echo "export N8N_ENCRYPTION_KEY=$ENCRYPTION_KEY" > .n8n_env.sh
-
-    echo "✅ New encryption key saved."
+# אם אין קובץ .env – צור חדש עם מפתח תקין
+if [ ! -f "$ENV_FILE" ]; then
+    echo "📄 Creating $ENV_FILE with secure key..."
+    KEY=$(generate_key)
+    echo "$ENV_VAR_NAME=$KEY" > "$ENV_FILE"
+    echo "✅ $ENV_FILE created with key."
+else
+    # קובץ קיים – נבדוק אם יש את המשתנה
+    if grep -q "^$ENV_VAR_NAME=" "$ENV_FILE"; then
+        CURRENT_KEY=$(extract_key)
+        if is_valid_key "$CURRENT_KEY"; then
+            echo "🔁 Existing key is valid. Using it."
+        else
+            echo "⚠️ Found invalid key. Regenerating..."
+            NEW_KEY=$(generate_key)
+            # מחליף את השורה עם המפתח הישן בחדש
+            sed -i.bak "s/^$ENV_VAR_NAME=.*/$ENV_VAR_NAME=$NEW_KEY/" "$ENV_FILE"
+            echo "✅ Key replaced."
+        fi
+    else
+        echo "➕ Key missing. Adding to $ENV_FILE..."
+        echo "$ENV_VAR_NAME=$(generate_key)" >> "$ENV_FILE"
+        echo "✅ Key added."
+    fi
 fi
 
-# טען אותו לסביבה הנוכחית (אם מקורבל)
-if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
-    source .n8n_env.sh
-    echo "✅ Key loaded to current shell."
-fi
+# הצגה לצורך בדיקה
+echo "==== .env ===="
+cat "$ENV_FILE"
+echo "=============="
 
 # בדיקת SSL
-echo "🔍 Checking for existing SSL certificates..."
+echo "🔍 Checking SSL certs..."
 if [ ! -f "n8n/ssl/privkey.pem" ] || [ ! -f "n8n/ssl/fullchain.pem" ]; then
     echo "🔧 Generating SSL certificates..."
     cd n8n && bash generate-ssl-certs.sh && cd ..
 else
-    echo "✅ SSL certificates already exist."
+    echo "✅ SSL certs already exist."
 fi
 
+# הפעלת Docker
 echo "🚀 Starting docker-compose..."
 docker compose up -d
-echo "🎉 Environment and services started successfully!"
-echo "🔑 Encryption key in this shell:"
-echo "   $N8N_ENCRYPTION_KEY"
+echo "🎉 Done!"
