@@ -17,6 +17,13 @@ clean: down
 	docker system prune -f --volumes
 	@echo "🧹 Clean complete."
 
+clean-images:
+	@echo "⚠️ Removing .env and backup files..."
+	rm -f .env .env.bak
+	@if [ "$$(docker ps -aq)" != "" ]; then docker rm -f $$(docker ps -aq); fi
+	@if [ "$$(docker images -q)" != "" ]; then docker rmi -f $$(docker images -q); fi
+
+
 update: 
 	@echo "🔄 Updating code from github.."
 	git pull
