@@ -4,6 +4,16 @@ set -e
 ENV_FILE=".env"
 ENV_VAR_NAME="N8N_ENCRYPTION_KEY"
 
+# התקנת certbot אם לא קיים
+if ! command -v certbot &> /dev/null; then
+  echo "🛠 Installing certbot..."
+  sudo apt update && sudo apt install certbot -y
+fi
+if [ $? -ne 0 ]; then
+    echo "❌ Failed to install certbot. Exiting."
+    exit 1
+fi
+
 is_valid_key() {
     [[ "$1" =~ ^[a-f0-9]{48}$ ]]
 }
@@ -16,14 +26,12 @@ extract_key() {
     grep "^$ENV_VAR_NAME=" "$ENV_FILE" | cut -d '=' -f2
 }
 
-# אם אין קובץ .env – צור חדש עם מפתח תקין
 if [ ! -f "$ENV_FILE" ]; then
     echo "📄 Creating $ENV_FILE with secure key..."
     KEY=$(generate_key)
     echo "$ENV_VAR_NAME=$KEY" > "$ENV_FILE"
     echo "✅ $ENV_FILE created with key."
 else
-    # קובץ קיים – נבדוק אם יש את המשתנה
     if grep -q "^$ENV_VAR_NAME=" "$ENV_FILE"; then
         CURRENT_KEY=$(extract_key)
         if is_valid_key "$CURRENT_KEY"; then
@@ -31,7 +39,6 @@ else
         else
             echo "⚠️ Found invalid key. Regenerating..."
             NEW_KEY=$(generate_key)
-            # מחליף את השורה עם המפתח הישן בחדש
             sed -i.bak "s/^$ENV_VAR_NAME=.*/$ENV_VAR_NAME=$NEW_KEY/" "$ENV_FILE"
             echo "✅ Key replaced."
         fi
@@ -42,7 +49,7 @@ else
     fi
 fi
 
-# הצגה לצורך בדיקה
+# --- הצגת המפתח לבדיקות בלבד, מומלץ להסיר בפרודקשן ---
 echo "==== .env ===="
 cat "$ENV_FILE"
 echo "=============="
@@ -63,10 +70,12 @@ if [ ! -d "n8n/data" ]; then
 else
     echo "📂 Data directory already exists."
 fi
-sudo chown -R 1000:1000 n8n
-sudo chmod -R 777 n8n
-sudo chmod 777 n8n/data
-sudo chmod 777 n8n/config
 
+sudo chown -R 1000:1000 n8n
+sudo chmod -R 700 n8n
+sudo chmod 700 n8n/data
+sudo chmod 700 n8n/config
+
+chmod +x n8n/generate-ssl-certs.sh
 
 echo "✅ Data directory is ready."

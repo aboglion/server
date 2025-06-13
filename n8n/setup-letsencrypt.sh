@@ -1,48 +1,48 @@
 #!/bin/bash
 
-# Script to obtain Let's Encrypt SSL certificates for N8N
-# This script requires certbot to be installed and a domain name pointing to this server
+DOMAIN="aboglion.top"
+EMAIL="admin@$DOMAIN"
+TARGET_DIR="$(pwd)/ssl"
+DOCKER_COMPOSE_PATH="$(pwd)/docker-compose.yml"
 
-# Check if domain name is provided
-if [ -z "$1" ]; then
-  echo "Usage: $0 <domain-name>"
-  echo "Example: $0 n8n.example.com"
-  exit 1
-fi
-
-DOMAIN=$1
-EMAIL=${2:-"admin@$DOMAIN"}
-
-# Create SSL directory if it doesn't exist
-mkdir -p ssl
-
-# Check if certbot is installed
+# התקנת certbot אם לא קיים
 if ! command -v certbot &> /dev/null; then
-  echo "Error: certbot is not installed."
-  echo "Please install certbot first:"
-  echo "  Ubuntu/Debian: sudo apt-get install certbot"
-  echo "  CentOS/RHEL: sudo yum install certbot"
-  exit 1
+  echo "🛠 Installing certbot..."
+  sudo apt update && sudo apt install certbot -y
 fi
 
-# Obtain certificates using certbot
-echo "Obtaining Let's Encrypt certificates for $DOMAIN..."
-certbot certonly --standalone --preferred-challenges http \
-  -d $DOMAIN --agree-tos --email $EMAIL --non-interactive
+# עצירה זמנית של Docker כדי לשחרר את פורט 80
+echo "🛑 Stopping Docker to allow certbot on port 80..."
+docker compose down
 
-# Copy certificates to the ssl directory
-echo "Copying certificates to ssl directory..."
-cp /etc/letsencrypt/live/$DOMAIN/privkey.pem ssl/
-cp /etc/letsencrypt/live/$DOMAIN/fullchain.pem ssl/
+# יצירת תיקיית ssl
+mkdir -p "$TARGET_DIR"
 
-# Set proper permissions
-chmod 600 ssl/privkey.pem
-chmod 644 ssl/fullchain.pem
+# בקשת תעודה
+echo "🔐 Requesting SSL certificate for $DOMAIN"
+sudo certbot certonly --standalone --preferred-challenges http \
+  -d "$DOMAIN" --agree-tos --email "$EMAIL" --non-interactive
 
-echo "Let's Encrypt SSL certificates obtained successfully!"
-echo "Files created:"
-echo "  - ssl/privkey.pem (private key)"
-echo "  - ssl/fullchain.pem (certificate)"
-echo ""
-echo "Don't forget to set up a renewal cron job for your certificates:"
-echo "0 0 1 * * certbot renew --quiet && cp /etc/letsencrypt/live/$DOMAIN/privkey.pem /path/to/n8n/ssl/ && cp /etc/letsencrypt/live/$DOMAIN/fullchain.pem /path/to/n8n/ssl/"
+# העתקת התעודות
+echo "📁 Copying certificates to $TARGET_DIR"
+sudo cp /etc/letsencrypt/live/$DOMAIN/privkey.pem "$TARGET_DIR/"
+sudo cp /etc/letsencrypt/live/$DOMAIN/fullchain.pem "$TARGET_DIR/"
+sudo chmod 600 "$TARGET_DIR/privkey.pem"
+sudo chmod 644 "$TARGET_DIR/fullchain.pem"
+
+# הפעלת n8n מחדש
+echo "🚀 Starting n8n with Docker"
+docker compose up -d
+
+# תוספת ל-cron
+CRON_CMD="certbot renew --quiet && cp /etc/letsencrypt/live/$DOMAIN/privkey.pem $TARGET_DIR/ && cp /etc/letsencrypt/live/$DOMAIN/fullchain.pem $TARGET_DIR/ && docker compose -f $DOCKER_COMPOSE_PATH restart"
+CRON_JOB="0 0 1 * * $CRON_CMD"
+
+if ! crontab -l 2>/dev/null | grep -q "$DOMAIN"; then
+  (crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
+  echo "✅ Cron job added to renew certificate monthly."
+else
+  echo "ℹ️ Cron job already exists."
+fi
+
+echo "🎉 Setup complete. N8N is available at: https://$DOMAIN:8743"
