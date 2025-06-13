@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DOMAIN="aboglion.top"
-EMAIL="admin@$DOMAIN"
+EMAIL="aboglion@gmail.com"
 TARGET_DIR="$(pwd)/ssl"
 DOCKER_COMPOSE_PATH="$(pwd)/docker-compose.yml"
 
