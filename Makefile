@@ -1,4 +1,3 @@
-
 # עצירת כל המכולות
 down:
 	@echo "🛑 Stopping Docker services..."
@@ -23,11 +22,20 @@ clean-images:
 	@if [ "$$(docker ps -aq)" != "" ]; then docker rm -f $$(docker ps -aq); fi
 	@if [ "$$(docker images -q)" != "" ]; then docker rmi -f $$(docker images -q); fi
 
-
-update: 
-	@echo "🔄 Updating code from github.."
+update:
+	@echo "🔄 Updating code from GitHub..."
 	git pull
-	@echo "✅ Images updated."
+	@echo "✅ Code updated from GitHub."
+
+update-n8n:
+	@echo "🔄 Updating N8N Docker image..."
+	docker compose pull n8n
+	@echo "🛑 Stopping N8N container..."
+	docker compose stop n8n
+	@echo "🚀 Starting N8N container with updated image..."
+	docker compose up -d n8n
+	@echo "📜 Following N8N logs..."
+	docker logs -f $$(docker ps --filter "name=n8n" -q)
 
 push:
 	@echo "🚀 Pushing changes to GitHub..."
@@ -36,15 +44,12 @@ push:
 	git push
 	@echo "✅ Changes pushed to GitHub."
 
-
 logs:
 	@echo "📜 Showing logs for n8n..."
 	docker logs -f $$(docker ps --filter "name=n8n" -q)
 
-	
 up: ./init.sh
 	@echo "🚀 Starting Docker services..."
 	docker compose up -d
 	$(MAKE) logs
 	@echo "🎉 All services started!"
-
