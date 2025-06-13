@@ -20,7 +20,6 @@ services:
           memory: 2G
 
 
-
   n8n:
     image: n8nio/n8n:latest
     restart: unless-stopped
@@ -36,8 +35,8 @@ services:
       - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
       - N8N_SSL_KEY=/home/node/.n8n/ssl/privkey.pem
       - N8N_SSL_CERT=/home/node/.n8n/ssl/fullchain.pem
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
     volumes:
-      - ./ssl:/home/node/.n8n/ssl
       - ./n8n:/home/node/.n8n
 
 
