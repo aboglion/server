@@ -3,13 +3,11 @@ services:
     image: public.ecr.aws/g7a8t7v6/inference-container:f4270a3f7c464e66c2879b885d6bbb40c7fc3e5f
     ports:
       - "3000:3000"
-    command:
-      - "--api-key"
-      - "ei_9fdc7ce93bd1d4fa9dbd33d7551d64bae4434c65b4b875f42dec41c641693dd1"
-      - "--run-http-server"
-      - "3000"
-      - "--impulse-id"
-      - "2"
+    entrypoint: >
+      edge-impulse-linux-runner
+      --api-key ei_9fdc7ce93bd1d4fa9dbd33d7551d64bae4434c65b4b875f42dec41c641693dd1
+      --run-http-server 3000
+      --impulse-id 2
     restart: unless-stopped
 
 
