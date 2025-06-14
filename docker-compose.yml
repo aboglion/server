@@ -8,7 +8,7 @@ services:
       - "3000:3000"
     command:
       [
-        "--api-key", "EI_API_KEY",
+        "--api-key", "ei_9fdc7ce93bd1d4fa9dbd33d7551d64bae4434c65b4b875f42dec41c641693dd1",
         "--run-http-server", "3000",
         "--impulse-id", "2",
         "--force-variant", "int8"
