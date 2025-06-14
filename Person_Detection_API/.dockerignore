@@ -1,8 +1,0 @@
-__pycache__/
-*.pyc
-.env
-.git
-.yolo11-env
-.gitignore
-node_modules/
-*.jpg
