@@ -27,7 +27,7 @@ update:
 	git pull
 	@echo "✅ Code updated from GitHub."
 
-update-n8n:
+update_n8n:
 	@echo "🔄 Updating N8N Docker image..."
 	docker compose pull n8n
 	@echo "🛑 Stopping N8N container..."
@@ -36,6 +36,16 @@ update-n8n:
 	docker compose up -d n8n
 	@echo "📜 Following N8N logs..."
 	docker logs -f $$(docker ps --filter "name=n8n" -q)
+
+update_person_detection_api:
+	@echo "🔄 Updating person_detection_api Docker image..."
+	docker compose pull person_detection_api
+	@echo "🛑 Stopping person_detection_api container..."
+	docker compose stop person_detection_api
+	@echo "🚀 Starting person_detection_api container with updated image..."
+	docker compose up -d person_detection_api
+	@echo "📜 Following person_detection_api logs..."
+	docker logs -f $$(docker ps --filter "name=person_detection_api" -q)
 
 push:
 	@echo "🚀 Pushing changes to GitHub..."
