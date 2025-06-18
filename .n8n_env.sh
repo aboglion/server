@@ -1,0 +1,1 @@
+export N8N_ENCRYPTION_KEY=4d2cbff611eddccedac58478b5ac40895dfc56c600b7419b

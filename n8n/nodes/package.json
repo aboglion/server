@@ -1,5 +1,7 @@
 {
   "name": "installed-nodes",
   "private": true,
-  "dependencies": {}
+  "dependencies": {
+    "@brave/n8n-nodes-brave-search": "1.0.14"
+  }
 }
