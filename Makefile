@@ -32,6 +32,7 @@ update_n8n:
 	docker compose pull n8n
 	@echo "🛑 Stopping N8N container..."
 	docker compose stop n8n
+	sudo chown -R 1000:1000 /root/.n8n
 	@echo "🚀 Starting N8N container with updated image..."
 	docker compose up -d n8n
 	@echo "📜 Following N8N logs..."

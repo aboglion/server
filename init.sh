@@ -77,5 +77,6 @@ sudo chmod 700 n8n/data
 sudo chmod 700 n8n/config
 
 chmod +x n8n/generate-ssl-certs.sh
+sudo chown -R 1000:1000 /root/.n8n
 
 echo "✅ Data directory is ready."
