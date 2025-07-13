@@ -1,5 +1,8 @@
-services:
+networks:
+  app_net:
+    driver: bridge
 
+services:
 
   trader:
     build: ./TRADER
@@ -10,6 +13,8 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ../data_backup/TRADER/LOGS:/app/LOGS
+    networks:
+      - app_net
 
   n8n:
     image: n8nio/n8n:latest
@@ -27,10 +32,12 @@ services:
       # - WEBHOOK_URL=https://aboglion.top:8743/
     volumes:
       - ../data_backup/n8n_data/:/home/node/.n8n
-
+    networks:
+      - app_net
 
   nginx:
     image: nginx:latest
+    restart: unless-stopped
     ports:
       - "8744:443"
     volumes:
@@ -38,5 +45,8 @@ services:
       - ./nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
       - n8n
+    networks:
+      - app_net
+
 
 
