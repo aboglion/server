@@ -54,7 +54,7 @@ logs-nginx:
 
 update:
 	git reset --hard HEAD
-	git pull
+	git pull origin main
 
 clean:
 	docker image prune -f
