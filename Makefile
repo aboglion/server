@@ -53,6 +53,7 @@ logs-nginx:
 	docker logs -f $$(docker ps --filter "name=nginx" -q)
 
 update:
+	git reset --hard HEAD
 	git pull
 
 clean:
