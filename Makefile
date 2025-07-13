@@ -18,9 +18,9 @@ up:
 	@echo ""
 	@echo "שירותים הורמו בהצלחה!"
 	@echo "כתובות גישה:"
-	@echo "Trader:    https://localhost:8744/  (Proxy ל-trader:7070)"
-	@echo "n8n:       https://localhost:8744/n8n/  (Proxy ל-n8n:5678)"
-	@echo "Nginx SSL: https://localhost:8744/  (443)"
+	@echo "Trader:    https://aboglion.top:8744/trader/  (Proxy ל-trader:7070)"
+	@echo "n8n:       https://aboglion.top:8744/n8n/  (Proxy ל-n8n:5678)"
+	@echo "Nginx SSL: https://aboglion.top:8744/  (443)"
 	@echo ""
 
 up-trader:
