@@ -1,0 +1,271 @@
+body {
+  font-family: sans-serif;
+  background-color: #121212;
+  color: #fff;
+  padding: 20px;
+  direction: rtl;
+}
+h1 {
+  text-align: center;
+  color: #00e5ff;
+}
+h2 {
+  color: #00bfff;
+  margin-bottom: 10px;
+}
+.chart-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 20px;
+  width: 100%;
+  padding-top: 10px;
+}
+#refresh-progress-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 20px auto;
+  height: 18px;
+  background: #222;
+  border-radius: 9px;
+  box-shadow: 0 0 4px #00e5ff44;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+#refresh-progress-bar {
+  height: 25%;
+  min-width: 2px;
+  width: 0%;
+  transition: width 0.3s linear;
+  background: linear-gradient(90deg,#00e5ff 0%,#00bfae 100%);
+  border-radius: 5px;
+  z-index: 1;
+}
+#refresh-progress-label {
+  position: absolute;
+  left: 10px;
+  font-size: 12px;
+  color: #fff;
+  z-index: 2;
+}
+
+.card {
+  background-color: #1e1e1e;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px #00e5ff44;
+  position: relative;
+}
+
+#table-container, #charts-section {
+  margin: 20px auto;
+  width: 95%;
+}
+#SQL_DB_DashboardData-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+#SQL_DB_DashboardData-table th, #SQL_DB_DashboardData-table td {
+  border: 1px solid #333;
+  padding: 10px;
+  text-align: center;
+}
+#SQL_DB_DashboardData-table thead {
+  background-color: #1e1e1e;
+  color: #00e5ff;
+}
+#SQL_DB_DashboardData-table tbody tr:nth-child(even) {
+  background-color: #2a2a2a;
+}
+.positive-pnl { color: #4caf50; }
+.negative-pnl { color: #f44336; }
+.signal-buy { color: #4caf50; font-weight: bold; }
+.signal-sell { color: #f44336; font-weight: bold; }
+.signal-neutral { color: #aaa; }
+
+/* Reset button */
+.reset-button {
+  background: linear-gradient(90deg, #00e5ff 0%, #00bfff 100%);
+  border: none;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  border: 2px solid #00e5ff;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 0 8px #00e5ff88;
+  transition: background 0.3s, transform 0.2s;
+}
+.reset-button:hover {
+  background: linear-gradient(90deg, #00bfff 0%, #00e5ff 100%);
+  transform: scale(1.07);
+}
+.reset-button:active {
+  background: #00bfff;
+  transform: scale(0.97);
+}
+.reset-button.flash {
+  animation: flash-btn 0.7s linear;
+}
+@keyframes flash-btn {
+  0%   { box-shadow: 0 0 16px #00e5ffcc; }
+  50%  { box-shadow: 0 0 32px #00e5ffcc; }
+  100% { box-shadow: 0 0 8px #00e5ff88; }
+}
+
+/* Transactions button */
+.transactions-button {
+  background: linear-gradient(90deg, #00e5ff 0%, #00bfff 100%);
+  border: none;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  border: 2px solid #00e5ff;
+  border-radius: 20px;
+  cursor: pointer;
+  box-shadow: 0 0 8px #00e5ff88;
+  transition: background 0.3s, transform 0.2s;
+  padding: 4px 10px;
+}
+.transactions-button:hover {
+  background: linear-gradient(90deg, #00bfff 0%, #00e5ff 100%);
+  transform: scale(1.07);
+}
+.transactions-button:active {
+  background: #00bfff;
+  transform: scale(0.97);
+}
+.transactions-button.disabled,
+.transactions-button:disabled {
+  background: #444;
+  color: #bbb;
+  border: 2px solid #666;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+
+/* מודל גרף מוגדל - מסך מלא */
+#enlarged-chart-modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(20, 20, 20, 0.98);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+#enlarged-chart-modal canvas {
+  width: 98vw !important;
+  height: 98vh !important;
+  max-width: 98vw;
+  max-height: 98vh;
+  background: #222;
+  border-radius: 12px;
+  box-shadow: 0 0 24px #00e5ff88;
+}
+#close-chart-modal {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  font-size: 2.2em;
+  color: #fff;
+  background: #111010;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+  z-index: 10000;
+}
+
+/* Modal for displaying transactions */
+#transactions-modal {
+  background: #fff;
+  border: 2px solid #444;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+  padding: 24px 16px 16px 16px;
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  max-width: 70vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  color: #222;
+  font-size: 1rem;
+  display: none;
+  border-radius: 12px;
+  font-family: Arial, sans-serif;
+  transition: all 0.3s ease;
+}
+#transactions-modal table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+#transactions-modal th, #transactions-modal td {
+  border: 1px solid #ccc;
+  padding: 6px 8px;
+  text-align: center;
+}
+#transactions-modal h3 {
+  margin-top: 10px;
+}
+#close-transactions-modal {
+  position: absolute;
+  top: 0px;
+  right: 8px;
+  background: #e74d3cb6;
+  color: #fff;
+  border: none;
+  padding: 4px 12px;
+  cursor: pointer;
+  font-size: 1rem;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
+#close-transactions-modal:hover {
+  background: #b31010;
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+
+}
+#transactions-modal table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 12px;
+  background: #fafbfc;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+}
+#transactions-modal th {
+  background: #2d89ef;
+  color: #fff;
+  font-weight: bold;
+  padding: 8px 10px;
+  border-bottom: 2px solid #2d89ef;
+}
+#transactions-modal td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #e5e5e5;
+}
+#transactions-modal tr:last-child td {
+  border-bottom: none;
+}
+#transactions-modal tr:nth-child(even) td {
+  background: #f1f6fa;
+}
+#transactions-modal tr:hover td {
+  background: #e3eaf2;
+}
+#transactions-modal table, #transactions-modal th, #transactions-modal td {
+  border: none;
+}

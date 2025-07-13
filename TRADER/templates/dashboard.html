@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>דשבורד מסחר בזמן אמת</title>
+  <link rel="stylesheet" href="/static/css/dashboard.css" />
+  <script src="/static/js/chart.js"></script>
+  <script src="/static/js/chartjs-plugin-zoom.umd.min.js"></script>
+  <script>
+    const REFRESH_INTERVAL = {{ reload_time_loop | tojson }};
+  </script>
+  <script src="/static/js/dashboard.js"></script>
+</head>
+<body>
+  <header>
+    <h1>דשבורד מסחר בזמן אמת</h1>
+  </header>
+
+  <div id="refresh-progress-container">
+    <div id="refresh-progress-bar"></div>
+    <span id="refresh-progress-label"></span>
+  </div>
+
+  <main>
+    <section id="table-section">
+      <div id="table-container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h2>סקירת מטבעות</h2>
+          <button id="reset-trades-btn" class="reset-button">איפוס עסקאות</button>
+        </div>
+        <table id="SQL_DB_DashboardData-table">
+          <thead>
+            <tr>
+              <th>מטבע</th>
+              <th>מומנטום</th>
+              <th>לחץ קנייה</th>
+              <th>לחץ מכירה</th>
+              <th>אות</th>
+              <th>פוזיציה</th>
+              <th>רווח %</th>
+              <th>קניות</th>
+              <th>מכירות</th>
+              <th>רווח מצטבר</th>
+              <th>עסקאות</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="charts-section">
+      <h2 style="text-align:center; color:#00e5ff;">גרפים חיים</h2>
+      <div id="line-charts" class="chart-container"></div>
+    </section>
+  </main>
+
+  <footer style="text-align:center; margin-top:20px; font-size:12px; color:#777;">
+    &copy; 2025 U.N.S | Live Crypto Dashboard
+  </footer>
+
+<!-- Enlarged Chart Modal -->
+<div id="enlarged-chart-modal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close-modal" id="close-chart-modal">❌</span>
+    <canvas id="enlarged-chart-canvas"></canvas>
+  </div>
+</div>
+</body>
+</html>
+
+<!-- Modal for displaying transactions -->
+<div id="transactions-modal" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); background:#fff; border:1px solid #888; padding:20px; z-index:1000; overflow:auto;">
+  <button onclick="this.parentElement.style.display='none'">סגור</button>
+</div>

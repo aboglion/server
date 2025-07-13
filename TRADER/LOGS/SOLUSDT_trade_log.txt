@@ -1,0 +1,2 @@
+[13:49:44] BUY @ 161.8350 | Signal: BUY
+[15:22:51] SELL @ 162.1650 | Reason: 📉 SELL_SIGNAL | PnL: 0.0039%
