@@ -31,6 +31,7 @@ services:
       - NODE_ENV=production
       - GENERIC_TIMEZONE=Asia/Jerusalem
       - NODE_FUNCTION_ALLOW_EXTERNAL=*
+      - N8N_PATH=/n8n/   # קריטי! חובה להגדיר כדי ש-n8n יעבוד תחת תת-נתיב
     volumes:
       - ../data_backup/n8n_data/:/home/node/.n8n
     networks:
