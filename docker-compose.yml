@@ -15,7 +15,7 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ../data_backup/TRADER/LOGS:/app/LOGS
-      - ../data_backup/TRADER/static:/app/static:ro
+      - ../data_backup/TRADER/static:/app/TRADER/static:ro
     networks:
       - app_net
 
@@ -33,7 +33,6 @@ services:
       - NODE_FUNCTION_ALLOW_EXTERNAL=*
     volumes:
       - ../data_backup/n8n_data/:/home/node/.n8n
-      - ../data_backup/n8n_static:/app/n8n_static:ro
     networks:
       - app_net
 
@@ -45,8 +44,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
-      - ../data_backup/TRADER_static:/app/static:ro
-      - ../data_backup/n8n_static:/app/n8n_static:ro
+      - ../data_backup/TRADER/static:/app/TRADER/static:ro
     depends_on:
       - n8n
       - trader
