@@ -58,5 +58,8 @@ update:
 
 clean:
 	docker image prune -f
+clean-all:
+	docker rm -f $(docker ps -aq) && docker rmi -f $(docker images -q)  
 format:
-	docker rm -f $(docker ps -aq) && docker rmi -f $(docker images -q) && docker volume rm -f $(docker volume ls -q)
+	docker rm -f $(docker ps -aq) && docker rmi -f $(docker images -q)  
+	docker volume rm -f $(docker volume ls -q)
