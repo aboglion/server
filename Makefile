@@ -37,6 +37,7 @@ logs-trader:
 
 up-n8n:
 	mkdir -p ../data_backup/n8n_data
+	sudo chown -R 1000:1000 ../data_backup/n8n_data/
 	docker compose build n8n
 	docker compose up -d n8n
 
