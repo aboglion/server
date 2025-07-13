@@ -15,6 +15,13 @@ up:
 	$(MAKE) up-trader
 	$(MAKE) up-n8n
 	$(MAKE) up-nginx
+	@echo ""
+	@echo "שירותים הורמו בהצלחה!"
+	@echo "כתובות גישה:"
+	@echo "Trader:    https://localhost:8744/  (Proxy ל-trader:7070)"
+	@echo "n8n:       https://localhost:8744/n8n/  (Proxy ל-n8n:5678)"
+	@echo "Nginx SSL: https://localhost:8744/  (443)"
+	@echo ""
 
 up-trader:
 	mkdir -p ../data_backup/TRADER/LOGS
@@ -41,7 +48,7 @@ logs-n8n:
 	docker logs -f $$(docker ps --filter "name=n8n" -q)
 
 up-nginx:
-	mkdir -p ./nginx/ssl
+	openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx/ssl/privkey.pem -out nginx/ssl/fullchain.pem -subj "/CN=localhost" -addext "subjectAltName=DNS:localhost,DNS:aboglion.top"
 	docker compose build nginx
 	docker compose up -d nginx
 
