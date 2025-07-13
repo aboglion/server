@@ -1,3 +1,5 @@
+version: "3.8"
+
 networks:
   app_net:
     driver: bridge
@@ -13,6 +15,7 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ../data_backup/TRADER/LOGS:/app/LOGS
+      - ../data_backup/TRADER/static:/app/static:ro
     networks:
       - app_net
 
@@ -27,11 +30,10 @@ services:
       - N8N_PROTOCOL=https
       - NODE_ENV=production
       - GENERIC_TIMEZONE=Asia/Jerusalem
-      # - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
       - NODE_FUNCTION_ALLOW_EXTERNAL=*
-      # - WEBHOOK_URL=https://aboglion.top:8743/
     volumes:
       - ../data_backup/n8n_data/:/home/node/.n8n
+      - ../data_backup/n8n_static:/app/n8n_static:ro
     networks:
       - app_net
 
@@ -43,10 +45,10 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ../data_backup/TRADER_static:/app/static:ro
+      - ../data_backup/n8n_static:/app/n8n_static:ro
     depends_on:
       - n8n
+      - trader
     networks:
       - app_net
-
-
-
