@@ -32,7 +32,7 @@ services:
   nginx:
     image: nginx:latest
     ports:
-      - "8743:443"
+      - "8744:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
