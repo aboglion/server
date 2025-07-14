@@ -1,16 +1,50 @@
+# main.py
+
 from flask import Flask, jsonify, request, render_template
-from werkzeug.middleware.dispatcher import DispatcherMiddleware
-from werkzeug.serving import run_simple
 import traceback, sys, signal, time, threading
 from dashboard_data.SQL_DB_DashboardData import SQL_DB_DashboardData
 from CONFIG import Config
 from COIN.coin_model import Coin, ALL_Coins
 from flask_cors import CORS
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+import logging
 
-app = Flask(__name__, template_folder="templates", static_folder="static")
+# --- הגדרות האפליקציה ---
+
+# הגדרה יחידה ונכונה של אפליקציית Flask
+# static_url_path יגרום ל-url_for לייצר נתיבים כמו /trader/static/style.css
+app = Flask(__name__,
+            template_folder="templates",
+            static_folder="static",
+            static_url_path="/trader/static")
+
 CORS(app)
+logging.getLogger('werkzeug').setLevel(logging.ERROR)
 coins_lock = threading.Lock()
 
+# --- Middleware ---
+# העטיפה הזו גורמת לכל הנתיבים של Flask לעבוד תחת הקידומת /trader
+# שים לב שהאובייקט המרכזי שרץ הוא 'application'
+application = DispatcherMiddleware(app)
+
+
+# --- לולאת הטריידינג ---
+def trading_loop():
+    try:
+        while True:
+            start_time = time.time()
+            with coins_lock:
+                for coin_obj in ALL_Coins.Coins:
+                    coin_obj.process_coin()
+
+            elapsed_time = time.time() - start_time
+            sleep_time = max(0, Config.CYCLE_INTERVAL - elapsed_time)
+            time.sleep(sleep_time)
+    except Exception as e:
+        print(f"Trading loop encountered an exception: {e}\n{traceback.format_exc()}")
+        sys.stdout.flush()
+
+# --- Routes של Flask ---
 @app.route("/")
 def dashboard():
     return render_template("dashboard.html", reload_time_loop=Config.CYCLE_INTERVAL)
@@ -19,45 +53,60 @@ def dashboard():
 def ping():
     return {"status": "alive"}
 
-@app.route("/api/live")
+@app.route("/api/live", methods=["GET"])
 def live_data():
     try:
         with coins_lock:
             result = SQL_DB_DashboardData.load_all_data(Config.SYMBOLS, Config.HISTORY_LIMIT)
     except Exception as e:
-        print(f"Error: {e}")
-        return jsonify({"error": "load error"}), 500
-    return jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL}) if result else ({"error": "No data"}, 404)
+        print(f"Error loading live data: {e}\n{traceback.print_exc()}")
+        return jsonify({"error": "Failed to load live data"}), 500
+    if not result:
+        return jsonify({"error": "No data available"}), 404
+    return jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL})
+
+@app.route("/api/transactions/<symbol>", methods=["GET"])
+def get_transactions(symbol):
+    symbol = symbol.upper()
+    trades = SQL_DB_DashboardData.load_trades(symbol, Config.HISTORY_LIMIT)
+    transactions = []
+    for action, price, timestamp, reason, signal, net_profit in trades:
+        transactions.append({
+            "action": action, "price": price, "timestamp": timestamp,
+            "reason": reason, "signal": signal, "net_profit": net_profit
+        })
+    return jsonify(transactions)
 
 @app.route("/api/reset_trades", methods=["POST"])
 def reset_all_trades():
+    print("RESET TRADES API CALLED")
     with coins_lock:
         for coin in ALL_Coins.Coins:
             coin.trade_manager.reset_trades()
             coin.reset_coin()
     return {"status": "all trades reset successfully"}
 
-application = DispatcherMiddleware(None, {
-    '/trader': app
-})
+@app.route("/api/n8n_hook", methods=["POST"])
+def n8n_hook():
+    data = request.get_json()
+    if not data or "symbols" not in data or not isinstance(data["symbols"], list):
+        return {"error": "Invalid data, symbols must be a list"}, 400
+    # The logic for updating symbols needs to be implemented here
+    # For now, just returning the current config
+    return {"status": "configuration updated", "symbols": Config.SYMBOLS}
 
-def trading_loop():
-    try:
-        while True:
-            start = time.time()
-            with coins_lock:
-                for coin_obj in ALL_Coins.Coins:
-                    coin_obj.process_coin()
-            time.sleep(max(0, Config.CYCLE_INTERVAL - (time.time() - start)))
-    except Exception as e:
-        print(f"Trading loop error: {e}\n{traceback.format_exc()}")
+# --- אתחול המערכת ---
+# קוד זה ירוץ פעם אחת כאשר Gunicorn טוען את האפליקציה
+print("Initializing coins...")
+try:
+    for symbol in Config.SYMBOLS:
+        Coin(symbol)
+    SQL_DB_DashboardData.restore_all_data()
+    print(f"Successfully initialized coins: {Config.SYMBOLS}")
+except Exception as e:
+    print(f"Error initializing coins: {e}\n{traceback.format_exc()}")
 
-if __name__ == "__main__":
-    try:
-        for symbol in Config.SYMBOLS:
-            Coin(symbol)
-        SQL_DB_DashboardData.restore_all_data()
-        threading.Thread(target=trading_loop, daemon=True).start()
-        run_simple("0.0.0.0", Config.PORT, application, use_reloader=False)
-    except Exception as e:
-        print(f"Startup error: {e}\n{traceback.format_exc()}")
+print("Starting trading loop thread...")
+trading_thread = threading.Thread(target=trading_loop, daemon=True)
+trading_thread.start()
+print("Trading loop thread started successfully.")

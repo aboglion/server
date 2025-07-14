@@ -7,7 +7,7 @@ networks:
 services:
 
   trader:
-    build: ./TRADER
+    build: ./TRADER  # יבנה את התמונה באמצעות TRADER/Dockerfile
     ports:
       - "7070:7070"
     restart: unless-stopped
@@ -35,9 +35,8 @@ services:
       - GENERIC_TIMEZONE=Asia/Jerusalem
       - NODE_FUNCTION_ALLOW_EXTERNAL=*
       - N8N_USER_FOLDER=/home/node/.n8n
-      - N8N_PROXY_HOPS=1                 # אם יש reverse proxy אחד
     volumes:
-      - ../data_backup/n8n_data:/home/node/.n8n:rw,z
+      - ../data_backup/n8n_data:/home/node/.n8n:rw
     networks:
       - app_net
 
@@ -49,6 +48,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
+      # שיתוף התיקייה הסטטית עם Nginx כדי שיוכל להגיש אותה ישירות
       - ../data_backup/TRADER/static:/app/static:ro
     depends_on:
       - n8n
