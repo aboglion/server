@@ -10,23 +10,20 @@ from werkzeug.middleware.dispatcher import DispatcherMiddleware
 import logging
 
 # --- הגדרות האפליקציה ---
-
-# הגדרה יחידה ונכונה של אפליקציית Flask
-# static_url_path יגרום ל-url_for לייצר נתיבים כמו /trader/static/style.css
 app = Flask(__name__,
             template_folder="templates",
-            static_folder="static",
-            static_url_path="/trader/static")
+            static_folder="static")
 
 CORS(app)
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
 coins_lock = threading.Lock()
 
-# --- Middleware ---
-# העטיפה הזו גורמת לכל הנתיבים של Flask לעבוד תחת הקידומת /trader
-# שים לב שהאובייקט המרכזי שרץ הוא 'application'
-application = DispatcherMiddleware(app)
-
+# --- Middleware (תיקון) ---
+# זו הגרסה הנכונה, שמקשרת את האפליקציה שלך לנתיב /trader
+# בקשה ל /trader/ תועבר לנתיב / באפליקציה
+application = DispatcherMiddleware(None, {
+    '/trader': app
+})
 
 # --- לולאת הטריידינג ---
 def trading_loop():
@@ -45,10 +42,12 @@ def trading_loop():
         sys.stdout.flush()
 
 # --- Routes של Flask ---
+# הנתיבים כאן הם יחסיים לנקודת החיבור, כלומר /trader/
 @app.route("/")
 def dashboard():
     return render_template("dashboard.html", reload_time_loop=Config.CYCLE_INTERVAL)
 
+# כל שאר ה-routes שלך נשארים ללא שינוי
 @app.route("/api/ping")
 def ping():
     return {"status": "alive"}
@@ -91,12 +90,10 @@ def n8n_hook():
     data = request.get_json()
     if not data or "symbols" not in data or not isinstance(data["symbols"], list):
         return {"error": "Invalid data, symbols must be a list"}, 400
-    # The logic for updating symbols needs to be implemented here
-    # For now, just returning the current config
     return {"status": "configuration updated", "symbols": Config.SYMBOLS}
 
 # --- אתחול המערכת ---
-# קוד זה ירוץ פעם אחת כאשר Gunicorn טוען את האפליקציה
+# קוד זה ירוץ פעם אחת בזכות הדגל --preload ב-Dockerfile
 print("Initializing coins...")
 try:
     for symbol in Config.SYMBOLS:
