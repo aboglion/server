@@ -3,8 +3,8 @@
 help:
 	@echo ""
 	@echo "שימוש ב-Makefile:"
-	@echo "  make up                -- הרמה של כל השירותים (trader, n8n, nginx)"
-	@echo "  make up-<service>      -- בניה והרמה של קונטיינר (trader, n8n, nginx)"
+	@echo "  make up                -- הרמה של כל השירותים (trader, n8n, caddy)"
+	@echo "  make up-<service>      -- בניה והרמה של קונטיינר (trader, n8n, caddy)"
 	@echo "  make down-<service>    -- עצירה ומחיקה של קונטיינר (לא מוחק volumes)"
 	@echo "  make logs-<service>    -- צפייה בלוגים של קונטיינר"
 	@echo "  make update            -- עדכון כל הפרויקט מגיט"
@@ -14,13 +14,13 @@ up:
 	$(MAKE) pull
 	$(MAKE) up-trader
 	$(MAKE) up-n8n
-	$(MAKE) up-nginx
+	$(MAKE) up-caddy
 	@echo ""
 	@echo "שירותים הורמו בהצלחה!"
 	@echo "כתובות גישה:"
 	@echo "Trader:    https://aboglion.top:8744/trader/  (Proxy ל-trader:7070)"
 	@echo "n8n:       https://aboglion.top:8744/n8n/  (Proxy ל-n8n:5678)"
-	@echo "Nginx SSL: https://aboglion.top:8744/  (443)"
+	@echo "caddy SSL: https://aboglion.top:8744/  (443)"
 	@echo ""
 
 up-trader:
@@ -49,9 +49,9 @@ down-n8n:
 logs-n8n:
 	docker logs -f $$(docker ps --filter "name=n8n" -q)
 
-up-nginx:
-	mkdir -p nginx/ssl
-	sudo chown -R 1000:1000 nginx/ssl
+up-caddy:
+	mkdir -p caddy/ssl
+	sudo chown -R 1000:1000 caddy/ssl
 	mkdir -p TRADER_APP/static/css 
 	mkdir -p TRADER_APP/static/js
 	sudo chmod a+rX ./TRADER_APP       
@@ -60,16 +60,16 @@ up-nginx:
 	sudo chmod a+rX ./TRADER_APP/static/js 
 	sudo chown -R 1000:1000 TRADER_APP/static
 	# Generate self-signed SSL certificate
-	openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx/ssl/privkey.pem -out nginx/ssl/fullchain.pem -subj "/CN=localhost" -addext "subjectAltName=DNS:localhost,DNS:aboglion.top"
-	docker compose build nginx
-	docker compose up -d nginx
+	openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout caddy/ssl/privkey.pem -out caddy/ssl/fullchain.pem -subj "/CN=localhost" -addext "subjectAltName=DNS:localhost,DNS:aboglion.top"
+	docker compose build caddy
+	docker compose up -d caddy
 
-down-nginx:
-	docker compose stop nginx
-	docker compose rm -f nginx
+down-caddy:
+	docker compose stop caddy
+	docker compose rm -f caddy
 
-logs-nginx:
-	docker logs -f $$(docker ps --filter "name=nginx" -q)
+logs-caddy:
+	docker logs -f $$(docker ps --filter "name=caddy" -q)
 
 pull:
 	git reset --hard HEAD
