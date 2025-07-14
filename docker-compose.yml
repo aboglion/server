@@ -29,8 +29,11 @@ services:
       - "8743:5678"
     environment:
       - N8N_HOST=aboglion.top
-      - N8N_PORT=5678
+      - N8N_PORT=5678  # Internal port of n8n
       - N8N_PROTOCOL=https
+      # 
+      - N8N_EDITOR_BASE_URL=https://localhost:8743/
+      - WEBHOOK_TUNNEL_URL=http://localhost:8743/
       # - N8N_EDITOR_BASE_URL=https://aboglion.top:8744/
       # - WEBHOOK_TUNNEL_URL=https://aboglion.top:8744/
       - NODE_ENV=production
