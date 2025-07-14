@@ -29,8 +29,8 @@ services:
       - N8N_HOST=aboglion.top
       - N8N_PORT=5678
       - N8N_PROTOCOL=https
-      - N8N_EDITOR_BASE_URL=https://aboglion.top:8744/
-      - WEBHOOK_TUNNEL_URL=https://aboglion.top:8744/
+      # - N8N_EDITOR_BASE_URL=https://aboglion.top:8744/
+      # - WEBHOOK_TUNNEL_URL=https://aboglion.top:8744/
       - NODE_ENV=production
       - GENERIC_TIMEZONE=Asia/Jerusalem
       - NODE_FUNCTION_ALLOW_EXTERNAL=*
