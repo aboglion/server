@@ -62,7 +62,7 @@ down-nginx:
 logs-nginx:
 	docker logs -f $$(docker ps --filter "name=nginx" -q)
 
-update:
+pull:
 	git reset --hard HEAD
 	git pull origin main
 
