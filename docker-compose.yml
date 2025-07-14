@@ -37,7 +37,7 @@ services:
       - N8N_USER_FOLDER=/home/node/.n8n
 
     volumes:
-      - ../data_backup/n8n_data:/home/node/.n8n:rw
+      - ../data_backup/n8n_data:/home/node/.n8n
     networks:
       - app_net
 
