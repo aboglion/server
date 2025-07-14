@@ -15,7 +15,9 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ../data_backup/TRADER/LOGS:/trader_app/LOGS
-
+    dns: 
+      - 8.8.8.8
+      - 8.8.4.4
     networks:
       - app_net
 
