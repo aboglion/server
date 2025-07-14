@@ -15,6 +15,8 @@ app = Flask(
 )
 
 CORS(app)
+
+
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
 coins_lock = threading.Lock()
 
@@ -94,6 +96,19 @@ def n8n_hook():
     # עדכון קונפיג (אם תרצה)
     # Config.SYMBOLS = data["symbols"]
     return {"status": "configuration updated", "symbols": Config.SYMBOLS}
+# ...
+
+# --- Middleware: תיקון מלא ל-DispatcherMiddleware ---
+def empty_app(environ, start_response):
+    """אפליקציה ריקה שמחזירה 404 לכל נתיב שאינו /trader"""
+    start_response('404 Not Found', [('Content-Type', 'text/plain')])
+    return [b'Not Found']
+
+# בקשה ל-/trader/ תעבור ל-app, כל השאר 404
+application = DispatcherMiddleware(empty_app, {
+    '/trader': app
+})
+
 
 # --- אתחול המערכת (פעם אחת בלבד) ---
 print("Initializing coins...")
