@@ -26,9 +26,11 @@ up:
 up-trader:
 	mkdir -p ../data_backup/TRADER/LOGS
 	mkdir -p ../data_backup/TRADER/static
+	cp -r ./TRADER/static/* ../data_backup/TRADER/static/
 	sudo chown -R 1000:1000 ../data_backup/TRADER/static/
 	docker compose build trader
 	docker compose up -d trader
+
 
 down-trader:
 	docker compose stop trader
