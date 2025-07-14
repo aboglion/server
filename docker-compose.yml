@@ -5,9 +5,9 @@ networks:
     driver: bridge
 
 services:
-
   trader:
-    build: ./TRADER  # יבנה את התמונה באמצעות TRADER/Dockerfile
+    build: ./TRADER
+    container_name: trader
     ports:
       - "7070:7070"
     restart: unless-stopped
@@ -21,6 +21,7 @@ services:
 
   n8n:
     image: n8nio/n8n:latest
+    container_name: n8n
     restart: unless-stopped
     ports:
       - "8743:5678"
@@ -42,13 +43,13 @@ services:
 
   nginx:
     image: nginx:latest
+    container_name: nginx
     restart: unless-stopped
     ports:
       - "8744:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
-      # שיתוף התיקייה הסטטית עם Nginx כדי שיוכל להגיש אותה ישירות
       - ../data_backup/TRADER/static:/app/static:ro
     depends_on:
       - n8n

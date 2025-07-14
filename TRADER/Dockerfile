@@ -1,5 +1,3 @@
-# TRADER/Dockerfile
-
 FROM python:3.9-slim
 
 WORKDIR /app
@@ -10,5 +8,4 @@ RUN pip install gunicorn
 
 COPY . .
 
-# תיקון: הוספת הדגל --preload כדי למנוע אתחולים מרובים
 CMD ["gunicorn", "--bind", "0.0.0.0:7070", "--workers", "3", "--preload", "main:application"]
