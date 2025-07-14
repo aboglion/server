@@ -25,9 +25,6 @@ up:
 
 up-trader:
 	mkdir -p ../data_backup/TRADER/LOGS
-	mkdir -p ../data_backup/TRADER/static
-	cp -r ./TRADER/static/* ../data_backup/TRADER/static/
-	sudo chown -R 1000:1000 ../data_backup/TRADER/static/
 	docker compose build trader
 	docker compose up -d trader
 
@@ -55,6 +52,8 @@ logs-n8n:
 up-nginx:
 	mkdir -p nginx/ssl
 	sudo chown -R 1000:1000 nginx/ssl
+	mkdir -p TRADER_APP/static
+	sudo chown -R 1000:1000 TRADER_APP/static
 	# Generate self-signed SSL certificate
 	openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx/ssl/privkey.pem -out nginx/ssl/fullchain.pem -subj "/CN=localhost" -addext "subjectAltName=DNS:localhost,DNS:aboglion.top"
 	docker compose build nginx
