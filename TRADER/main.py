@@ -1,5 +1,3 @@
-# main.py
-
 from flask import Flask, jsonify, request, render_template
 import traceback, sys, signal, time, threading
 from dashboard_data.SQL_DB_DashboardData import SQL_DB_DashboardData
@@ -10,18 +8,24 @@ from werkzeug.middleware.dispatcher import DispatcherMiddleware
 import logging
 
 # --- הגדרות האפליקציה ---
-app = Flask(__name__,
-            template_folder="templates",
-            static_folder="static")
+app = Flask(
+    __name__,
+    template_folder="templates",
+    static_folder="static"
+)
 
 CORS(app)
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
 coins_lock = threading.Lock()
 
-# --- Middleware (תיקון) ---
-# זו הגרסה הנכונה, שמקשרת את האפליקציה שלך לנתיב /trader
-# בקשה ל /trader/ תועבר לנתיב / באפליקציה
-application = DispatcherMiddleware(None, {
+# --- Middleware: תיקון מלא ל-DispatcherMiddleware ---
+def empty_app(environ, start_response):
+    """אפליקציה ריקה שמחזירה 404 לכל נתיב שאינו /trader"""
+    start_response('404 Not Found', [('Content-Type', 'text/plain')])
+    return [b'Not Found']
+
+# בקשה ל-/trader/ תעבור ל-app, כל השאר 404
+application = DispatcherMiddleware(empty_app, {
     '/trader': app
 })
 
@@ -33,7 +37,6 @@ def trading_loop():
             with coins_lock:
                 for coin_obj in ALL_Coins.Coins:
                     coin_obj.process_coin()
-
             elapsed_time = time.time() - start_time
             sleep_time = max(0, Config.CYCLE_INTERVAL - elapsed_time)
             time.sleep(sleep_time)
@@ -41,13 +44,11 @@ def trading_loop():
         print(f"Trading loop encountered an exception: {e}\n{traceback.format_exc()}")
         sys.stdout.flush()
 
-# --- Routes של Flask ---
-# הנתיבים כאן הם יחסיים לנקודת החיבור, כלומר /trader/
+# --- Routes של Flask (הכל תחת /trader) ---
 @app.route("/")
 def dashboard():
     return render_template("dashboard.html", reload_time_loop=Config.CYCLE_INTERVAL)
 
-# כל שאר ה-routes שלך נשארים ללא שינוי
 @app.route("/api/ping")
 def ping():
     return {"status": "alive"}
@@ -58,7 +59,7 @@ def live_data():
         with coins_lock:
             result = SQL_DB_DashboardData.load_all_data(Config.SYMBOLS, Config.HISTORY_LIMIT)
     except Exception as e:
-        print(f"Error loading live data: {e}\n{traceback.print_exc()}")
+        print(f"Error loading live data: {e}\n{traceback.format_exc()}")
         return jsonify({"error": "Failed to load live data"}), 500
     if not result:
         return jsonify({"error": "No data available"}), 404
@@ -90,10 +91,11 @@ def n8n_hook():
     data = request.get_json()
     if not data or "symbols" not in data or not isinstance(data["symbols"], list):
         return {"error": "Invalid data, symbols must be a list"}, 400
+    # עדכון קונפיג (אם תרצה)
+    # Config.SYMBOLS = data["symbols"]
     return {"status": "configuration updated", "symbols": Config.SYMBOLS}
 
-# --- אתחול המערכת ---
-# קוד זה ירוץ פעם אחת בזכות הדגל --preload ב-Dockerfile
+# --- אתחול המערכת (פעם אחת בלבד) ---
 print("Initializing coins...")
 try:
     for symbol in Config.SYMBOLS:
