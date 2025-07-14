@@ -55,7 +55,7 @@ onReady(async () => { // Make the callback async
   if (resetBtn) {
     resetBtn.addEventListener('click', async () => {
       try {
-        const res = await fetch('/api/reset_trades', { method: 'POST' });
+        const res = await fetch('/trader/api/reset_trades', { method: 'POST' });
         if (res.ok) {
           resetBtn.classList.add('flash');
           setTimeout(() => resetBtn.classList.remove('flash'), 700);
@@ -278,7 +278,7 @@ async function createEnlargedChart(canvas, symbol, metric, resultsCache, clearBu
 // -- שליפת נתונים עיקריים --
 async function fetchData() {
   try {
-    const res = await fetch('/api/live');
+    const res = await fetch('/trader/api/live');
     if (!res.ok) {
       console.error("HTTP error!", res.status);
       return null;
@@ -300,7 +300,7 @@ async function fetchTradePoints(symbol, cache = null) {
     };
   }
   try {
-    const res = await fetch('/api/live');
+    const res = await fetch('/trader/api/live');
     if (!res.ok) return { buyPoints: [], sellPoints: [] };
     const results = await res.json();
     if (results.data && results.data[symbol]) {
@@ -524,7 +524,7 @@ function addTransactionButtonListeners() {
 // -- פונקציה להצגת עסקאות (סטאב) --
 async function displayTransactions(symbol) {
   try {
-    const response = await fetch(`/api/transactions/${symbol}`);
+    const response = await fetch(`/trader/api/transactions/${symbol}`);
     const transactions = await response.json();
     let html = `<h3>עסקאות עבור ${symbol}</h3>`;
     if (transactions.length === 0) {
