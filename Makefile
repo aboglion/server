@@ -53,6 +53,10 @@ up-nginx:
 	mkdir -p nginx/ssl
 	sudo chown -R 1000:1000 nginx/ssl
 	mkdir -p TRADER_APP/static
+	sudo chmod a+rX ./TRADER_APP       
+	sudo chmod a+rX ./TRADER_APP/static 
+	sudo chmod a+rX ./TRADER_APP/static/css 
+	sudo chmod a+rX ./TRADER_APP/static/js 
 	sudo chown -R 1000:1000 TRADER_APP/static
 	# Generate self-signed SSL certificate
 	openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx/ssl/privkey.pem -out nginx/ssl/fullchain.pem -subj "/CN=localhost" -addext "subjectAltName=DNS:localhost,DNS:aboglion.top"
