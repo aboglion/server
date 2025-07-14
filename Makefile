@@ -10,6 +10,7 @@ help:
 	@echo "  make update            -- עדכון כל הפרויקט מגיט"
 	@echo "  make clean             -- ניקוי אימג'ים שלא בהרצה"
 	@echo ""
+
 up:
 	$(MAKE) pull
 	$(MAKE) up-trader
@@ -18,16 +19,14 @@ up:
 	@echo ""
 	@echo "שירותים הורמו בהצלחה!"
 	@echo "כתובות גישה:"
-	@echo "Trader:    https://aboglion.top:8744/trader/  (Proxy ל-trader:7070)"
-	@echo "n8n:       https://aboglion.top:8744/n8n/  (Proxy ל-n8n:5678)"
-	@echo "caddy SSL: https://aboglion.top:8744/  (443)"
+	@echo "Trader:    https://aboglion.top:8744/trader/"
+	@echo "n8n:       https://aboglion.top:8744/"
 	@echo ""
 
 up-trader:
 	mkdir -p ../data_backup/TRADER/LOGS
 	docker compose build trader
 	docker compose up -d trader
-
 
 down-trader:
 	docker compose stop trader
@@ -51,14 +50,9 @@ logs-n8n:
 
 up-caddy:
 	mkdir -p caddy/ssl
-	sudo chown -R 1000:1000 caddy/ssl
-	mkdir -p TRADER_APP/static/css 
-	mkdir -p TRADER_APP/static/js
-	sudo chmod a+rX ./TRADER_APP       
-	sudo chmod a+rX ./TRADER_APP/static 
-	sudo chmod a+rX ./TRADER_APP/static/css 
-	sudo chmod a+rX ./TRADER_APP/static/js 
-	sudo chown -R 1000:1000 TRADER_APP/static
+	# Corrected paths to be inside the TRADER build context
+	mkdir -p ./TRADER/static/css 
+	mkdir -p ./TRADER/static/js
 	# Generate self-signed SSL certificate
 	openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout caddy/ssl/privkey.pem -out caddy/ssl/fullchain.pem -subj "/CN=localhost" -addext "subjectAltName=DNS:localhost,DNS:aboglion.top"
 	docker compose build caddy
@@ -78,8 +72,10 @@ pull:
 
 clean:
 	docker image prune -f
+
 clean-all:
 	docker stop $$(docker ps -aq) && docker rm -f $$(docker ps -a -aq) && docker rmi -f $$(docker images -q)  
+
 format:
 	docker rm -f $$(docker ps -aq) && docker rmi -f $$(docker images -q)  
 	docker volume rm -f $$(docker volume ls -q)

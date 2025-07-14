@@ -4,7 +4,6 @@ from dashboard_data.SQL_DB_DashboardData import SQL_DB_DashboardData
 from CONFIG import Config
 from COIN.coin_model import Coin, ALL_Coins
 from flask_cors import CORS
-from werkzeug.middleware.dispatcher import DispatcherMiddleware
 import logging
 
 # --- הגדרות האפליקציה ---
@@ -13,23 +12,10 @@ app = Flask(
     template_folder="templates",
     static_folder="static"
 )
-
 CORS(app)
-
 
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
 coins_lock = threading.Lock()
-
-# --- Middleware: תיקון מלא ל-DispatcherMiddleware ---
-def empty_app(environ, start_response):
-    """אפליקציה ריקה שמחזירה 404 לכל נתיב שאינו /trader"""
-    start_response('404 Not Found', [('Content-Type', 'text/plain')])
-    return [b'Not Found']
-
-# בקשה ל-/trader/ תעבור ל-app, כל השאר 404
-application = DispatcherMiddleware(empty_app, {
-    '/trader': app
-})
 
 # --- לולאת הטריידינג ---
 def trading_loop():
@@ -46,7 +32,7 @@ def trading_loop():
         print(f"Trading loop encountered an exception: {e}\n{traceback.format_exc()}")
         sys.stdout.flush()
 
-# --- Routes של Flask (הכל תחת /trader) ---
+# --- Routes של Flask ---
 @app.route("/")
 def dashboard():
     return render_template("dashboard.html", reload_time_loop=Config.CYCLE_INTERVAL)
@@ -96,19 +82,6 @@ def n8n_hook():
     # עדכון קונפיג (אם תרצה)
     # Config.SYMBOLS = data["symbols"]
     return {"status": "configuration updated", "symbols": Config.SYMBOLS}
-# ...
-
-# --- Middleware: תיקון מלא ל-DispatcherMiddleware ---
-def empty_app(environ, start_response):
-    """אפליקציה ריקה שמחזירה 404 לכל נתיב שאינו /trader"""
-    start_response('404 Not Found', [('Content-Type', 'text/plain')])
-    return [b'Not Found']
-
-# בקשה ל-/trader/ תעבור ל-app, כל השאר 404
-application = DispatcherMiddleware(empty_app, {
-    '/trader': app
-})
-
 
 # --- אתחול המערכת (פעם אחת בלבד) ---
 print("Initializing coins...")
@@ -124,3 +97,6 @@ print("Starting trading loop thread...")
 trading_thread = threading.Thread(target=trading_loop, daemon=True)
 trading_thread.start()
 print("Trading loop thread started successfully.")
+
+# Note: If you use a production WSGI server like Gunicorn,
+# you will point it to this 'app' object (e.g., gunicorn --bind 0.0.0.0:7070 'app:app')

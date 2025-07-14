@@ -8,4 +8,5 @@ RUN pip install gunicorn
 
 COPY . .
 
-CMD ["gunicorn", "--bind", "0.0.0.0:7070", "--workers", "3", "--preload", "main:application"]
+
+CMD ["gunicorn", "--bind", "0.0.0.0:7070", "--workers", "3", "--preload", "app:app"]

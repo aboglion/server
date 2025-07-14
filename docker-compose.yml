@@ -8,14 +8,11 @@ services:
   trader:
     build: ./TRADER
     container_name: trader
-    ports:
-      - "7070:7070"
     restart: unless-stopped
     environment:
       - PYTHONUNBUFFERED=1
     volumes:
       - ../data_backup/TRADER/LOGS:/trader_app/LOGS
-
     networks:
       - app_net
 
@@ -23,22 +20,16 @@ services:
     image: n8nio/n8n:latest
     container_name: n8n
     restart: unless-stopped
-    ports:
-      - "8743:5678"
     environment:
       - N8N_HOST=aboglion.top
-      - N8N_PORT=5678  # Internal port of n8n
+      - N8N_PORT=5678
       - N8N_PROTOCOL=https
-      # 
-      # - N8N_EDITOR_BASE_URL=https://localhost:8743/
-      # - WEBHOOK_TUNNEL_URL=http://localhost:8743/
       - N8N_EDITOR_BASE_URL=https://aboglion.top:8744/
       - WEBHOOK_TUNNEL_URL=https://aboglion.top:8744/
       - NODE_ENV=production
       - GENERIC_TIMEZONE=Asia/Jerusalem
       - NODE_FUNCTION_ALLOW_EXTERNAL=*
       - N8N_USER_FOLDER=/home/node/.n8n
-
     volumes:
       - ../data_backup/n8n_data:/home/node/.n8n
     networks:
@@ -49,11 +40,10 @@ services:
     container_name: caddy
     restart: unless-stopped
     ports:
-      - "8744:443"
+      - "8744:443"  # This is the only port that needs to be public
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./caddy/ssl:/etc/caddy/ssl:ro
-      - ./TRADER/static:/TRADER_APP/static:ro
     depends_on:
       - n8n
       - trader
