@@ -5,6 +5,8 @@ from CONFIG import Config
 from COIN.coin_model import Coin, ALL_Coins
 from flask_cors import CORS
 import logging
+from dashboard_data.SQL_DB_DashboardData import initialize_dashboard_db
+initialize_dashboard_db()
 
 # --- הגדרות האפליקציה ---
 app = Flask(
