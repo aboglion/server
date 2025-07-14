@@ -15,7 +15,6 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ../data_backup/TRADER/LOGS:/trader_app/LOGS
-      - ../data_backup/TRADER/static:/trader_app/static
 
     networks:
       - app_net
@@ -51,7 +50,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
-      - ../data_backup/TRADER/static:/TRADER/static:ro
+      - ./TRADER/static:/TRADER/static:ro
     depends_on:
       - n8n
       - trader
