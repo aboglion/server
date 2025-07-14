@@ -28,10 +28,12 @@ services:
       - N8N_HOST=aboglion.top
       - N8N_PORT=5678
       - N8N_PROTOCOL=https
+      - N8N_PATH=/n8n/
+      - N8N_EDITOR_BASE_URL=https://aboglion.top/n8n/
+      - WEBHOOK_TUNNEL_URL=https://aboglion.top/n8n/
       - NODE_ENV=production
       - GENERIC_TIMEZONE=Asia/Jerusalem
       - NODE_FUNCTION_ALLOW_EXTERNAL=*
-      - N8N_PATH=/n8n/
     volumes:
       - ../data_backup/n8n_data/:/home/node/.n8n
     networks:

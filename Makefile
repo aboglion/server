@@ -25,6 +25,8 @@ up:
 
 up-trader:
 	mkdir -p ../data_backup/TRADER/LOGS
+	mkdir -p ../data_backup/TRADER/static
+	sudo chown -R 1000:1000 ../data_backup/TRADER/static/
 	docker compose build trader
 	docker compose up -d trader
 
@@ -71,3 +73,9 @@ clean-all:
 format:
 	docker rm -f $$(docker ps -aq) && docker rmi -f $$(docker images -q)  
 	docker volume rm -f $$(docker volume ls -q)
+
+push:
+	git add .
+	git commit -m "Update Makefile and docker-compose.yml"
+	git push origin main
+	@echo "Changes pushed to the repository."
