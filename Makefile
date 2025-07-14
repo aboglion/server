@@ -53,6 +53,9 @@ logs-n8n:
 	docker logs -f $$(docker ps --filter "name=n8n" -q)
 
 up-nginx:
+	mkdir -p nginx/ssl
+	sudo chown -R 1000:1000 nginx/ssl
+	# Generate self-signed SSL certificate
 	openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx/ssl/privkey.pem -out nginx/ssl/fullchain.pem -subj "/CN=localhost" -addext "subjectAltName=DNS:localhost,DNS:aboglion.top"
 	docker compose build nginx
 	docker compose up -d nginx
