@@ -4,3 +4,7 @@ __pycache__/
 yolo11-env
 nginx/ssl/*
 TRADER/LOGS/*
+*pem
+*.log
+*.sqlite3
+*.db
