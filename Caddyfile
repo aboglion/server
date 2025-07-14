@@ -1,23 +1,15 @@
 aboglion.top {
     tls /etc/caddy/ssl/fullchain.pem /etc/caddy/ssl/privkey.pem
 
-    # Handle all requests for the trader app under /trader/
-    # This includes API calls, the dashboard, and static files.
     @trader path /trader/*
     handle @trader {
         uri strip_prefix /trader
         reverse_proxy trader:7070
     }
 
-    # Redirect /trader to /trader/ to ensure relative paths work
     @trader_redirect path /trader
     redir @trader_redirect /trader/
-
-    # The catch-all reverse proxy for n8n remains at the end
-    reverse_proxy n8n:5678 {
-        header_up Host {host}
-        header_up X-Real-IP {remote}
-        header_up X-Forwarded-For {remote}
-        header_up X-Forwarded-Proto {scheme}
-    }
+    
+    # The 'header_up' lines were removed from the n8n proxy
+    reverse_proxy n8n:5678
 }
