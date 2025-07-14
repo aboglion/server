@@ -65,6 +65,7 @@ logs-nginx:
 pull:
 	git reset --hard HEAD
 	git pull origin main
+	sleep 4
 
 clean:
 	docker image prune -f
