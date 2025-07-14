@@ -52,7 +52,8 @@ logs-n8n:
 up-nginx:
 	mkdir -p nginx/ssl
 	sudo chown -R 1000:1000 nginx/ssl
-	mkdir -p TRADER_APP/static
+	mkdir -p TRADER_APP/static/css 
+	mkdir -p TRADER_APP/static/js
 	sudo chmod a+rX ./TRADER_APP       
 	sudo chmod a+rX ./TRADER_APP/static 
 	sudo chmod a+rX ./TRADER_APP/static/css 
