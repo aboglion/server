@@ -34,6 +34,7 @@ services:
       - NODE_ENV=production
       - GENERIC_TIMEZONE=Asia/Jerusalem
       - NODE_FUNCTION_ALLOW_EXTERNAL=*
+      - N8N_USER_FOLDER=/home/node/.n8n
     volumes:
       - ../data_backup/n8n_data/:/home/node/.n8n
     networks:
