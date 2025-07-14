@@ -11,7 +11,7 @@ help:
 	@echo "  make clean             -- ניקוי אימג'ים שלא בהרצה"
 	@echo ""
 up:
-	$(MAKE) update
+	$(MAKE) pull
 	$(MAKE) up-trader
 	$(MAKE) up-n8n
 	$(MAKE) up-nginx
