@@ -399,7 +399,6 @@ function updateTable(results) {
 
   const sortedSymbols = Object.keys(results).sort((a, b) => (a === "ALL" ? -1 : b === "ALL" ? 1 : a.localeCompare(b)));
   const fragment = document.createDocumentFragment();
-  console.log("Sorted symbols:", sortedSymbols);
   
   for (const symbol of sortedSymbols) {
     if (symbol === 'ALL') continue;
@@ -408,6 +407,7 @@ function updateTable(results) {
 
     if (row) {
       // Update existing row
+      row.cells[0].textContent = symbol;
       row.cells[1].textContent = m.momentum?.toFixed(4) || '';
       row.cells[2].textContent = m.buy_pressure?.toFixed(4) || '';
       row.cells[3].textContent = m.sell_pressure?.toFixed(4) || '';
