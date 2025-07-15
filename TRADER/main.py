@@ -72,8 +72,7 @@ def live_data():
             }
     else:
         for symbol in Config.SYMBOLS:
-            if result[symbol].get("momentum") is None:
-                print("data is :", result[symbol])
+            if result[symbol].get("momentum")== 0.0 and result[symbol].get("buy_pressure") == 0.0 and result[symbol].get("sell_pressure") == 0.0:
                 result[symbol].update({
                     "symbol": symbol,
                     "binance_price": "אוסף נתונים",
@@ -88,7 +87,6 @@ def live_data():
                     "total_profit": 0.0,
                     "trades": []
             })
-        print ("data now 2 :", result)
     return jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL})
 
 @app.route("/api/transactions/<symbol>", methods=["GET"])
