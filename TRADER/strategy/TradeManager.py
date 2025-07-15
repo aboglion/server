@@ -1,4 +1,3 @@
-from sympy import false
 from CONFIG import Config, SignalType
 from dashboard_data.SQL_DB_DashboardData import SQL_DB_DashboardData
 
