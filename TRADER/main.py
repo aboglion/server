@@ -53,7 +53,24 @@ def live_data():
         return jsonify({"error": "Failed to load live data"}), 500
     if not result:
         # Return table with coin names and all expected fields as placeholder, as a dict
-        
+        result = {}
+        for symbol in Config.SYMBOLS:
+            result[symbol] = {
+                "symbol": symbol,
+                "binance_price": 0.0,
+                "momentum": 0.0,
+                "buy_pressure": 0.0,
+                "sell_pressure": 0.0,
+                "signal": "No Signal",
+                "position": "No Position",
+                "pnl_pct": 0.0,
+                "total_buy_trades": 0,
+                "total_sell_trades": 0,
+                "total_profit": 0.0,
+                "trades": []
+            }
+        return jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL})
+    if result[symbol].get("momentum") is None:
         for symbol in Config.SYMBOLS:
             result[symbol] = {
                 "symbol": symbol,
