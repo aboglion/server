@@ -52,25 +52,25 @@ def live_data():
         print(f"Error loading live data: {e}\n{traceback.format_exc()}")
         return jsonify({"error": "Failed to load live data"}), 500
     if not result:
-        # Return table with coin names and all expected fields as placeholder
-        placeholder_data = [
-            {
+        # Return table with coin names and all expected fields as placeholder, as a dict
+        placeholder_data = {
+            symbol: {
                 "symbol": symbol,
-                "binance_price": None,
-                "momentum": None,
-                "buy_pressure": None,
-                "sell_pressure": None,
+                "binance_price": "אוסף",
+                "momentum": "אוסף",
+                "buy_pressure": "אוסף",
+                "sell_pressure": "אוסף",
                 "signal": "אוסף",
                 "position": "אוסף",
-                "pnl_pct": None,
+                "pnl_pct": "אוסף",
                 "total_buy_trades": 0,
                 "total_sell_trades": 0,
-                "total_profit": None,
+                "total_profit": 0,
                 "trades": None
             }
             for symbol in Config.SYMBOLS
-        ]
-        return jsonify({"data": placeholder_data, "cycle_interval": Config.CYCLE_INTERVAL})
+        }
+        return jsonify(placeholder_data)
     return jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL})
 
 @app.route("/api/transactions/<symbol>", methods=["GET"])
