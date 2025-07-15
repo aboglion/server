@@ -52,21 +52,21 @@ def live_data():
         print(f"Error loading live data: {e}\n{traceback.format_exc()}")
         return jsonify({"error": "Failed to load live data"}), 500
     if not result:
-        # Return table with coin names and all expected fields as "אוסף" or default
+        # Return table with coin names and all expected fields as placeholder
         placeholder_data = [
             {
                 "symbol": symbol,
-                "binance_price": "אוסף",
-                "momentum": "אוסף",
-                "buy_pressure": "אוסף",
-                "sell_pressure": "אוסף",
+                "binance_price": None,
+                "momentum": None,
+                "buy_pressure": None,
+                "sell_pressure": None,
                 "signal": "אוסף",
                 "position": "אוסף",
-                "pnl_pct": "אוסף",
-                "total_buy_trades": "אוסף",
-                "total_sell_trades": "אוסף",
-                "total_profit": "אוסף",
-                "trades": "אוסף"
+                "pnl_pct": None,
+                "total_buy_trades": 0,
+                "total_sell_trades": 0,
+                "total_profit": None,
+                "trades": None
             }
             for symbol in Config.SYMBOLS
         ]
