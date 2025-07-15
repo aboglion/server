@@ -43,16 +43,16 @@ def dashboard():
 def ping():
     return {"status": "alive"}
 
-reset=False
+reset = False
 @app.route("/api/live", methods=["GET"])
 def live_data():
     global reset
     try:
         with coins_lock:
-            result = SQL_DB_DashboardData.load_all_data(Config.SYMBOLS, Config.HISTORY_LIMIT)
             if reset:
-                print("No data found, initializing with empty structure.")
-                result = None
+                SQL_DB_DashboardData.reset_trades_sqlite()
+                reset = False
+            result = SQL_DB_DashboardData.load_all_data(Config.SYMBOLS, Config.HISTORY_LIMIT)
     except Exception as e:
         print(f"Error loading live data: {e}\n{traceback.format_exc()}")
         return jsonify({"error": "Failed to load live data"}), 500
@@ -115,7 +115,6 @@ def reset_all_trades():
                 coin.trade_manager.reset_trades()
                 coin.reset_coin()
                 SQL_DB_DashboardData.reset_trades_sqlite()
-                reset = False
     except Exception as e:
         reset = False
         print(f"Error resetting trades: {e}\n{traceback.format_exc()}")
