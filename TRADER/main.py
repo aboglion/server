@@ -52,6 +52,8 @@ def live_data():
         print(f"Error loading live data: {e}\n{traceback.format_exc()}")
         return jsonify({"error": "Failed to load live data"}), 500
     if not result:
+        print("No data found, initializing with empty structure.")
+        print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<,")
         result = {}
         for symbol in Config.SYMBOLS:
             result[symbol] = {
@@ -69,6 +71,8 @@ def live_data():
                 "trades": []
             }
     else:
+        print("Data loaded successfully, processing symbols.")
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
         for symbol in Config.SYMBOLS:
             if result[symbol].get("momentum") is None:
                 result[symbol].update({
