@@ -389,6 +389,7 @@ async function renderDashboard(clearBuySell = false) {
 function updateTable(results) {
   //resetRefreshProgress(); // Removed from here, now called in setInterval
   const tbody = document.getElementById('SQL_DB_DashboardData-table').getElementsByTagName('tbody')[0];
+  console.log("Updating table with results:", results);
   const existingRows = new Map();
   
   // Map existing rows by symbol
