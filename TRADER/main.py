@@ -86,7 +86,6 @@ def live_data():
                     "total_profit": 0.0,
                     "trades": []
             })
-    print(result)
     return jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL})
 
 @app.route("/api/transactions/<symbol>", methods=["GET"])
