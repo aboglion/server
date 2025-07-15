@@ -70,7 +70,7 @@ def live_data():
             }
             for symbol in Config.SYMBOLS
         }
-        return jsonify(placeholder_data)
+        return jsonify({"data": placeholder_data, "cycle_interval": Config.CYCLE_INTERVAL})
     return jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL})
 
 @app.route("/api/transactions/<symbol>", methods=["GET"])
