@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request, render_template
-import traceback, sys, signal, time, threading
+import traceback, sys, signal, time, multiprocessing
 from dashboard_data.SQL_DB_DashboardData import SQL_DB_DashboardData
 from CONFIG import Config
 from COIN.coin_model import Coin, ALL_Coins
@@ -17,7 +17,7 @@ app = Flask(
 CORS(app)
 
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
-coins_lock = threading.Lock()
+coins_lock = multiprocessing.Lock()
 
 # --- לולאת הטריידינג ---
 def trading_loop():
