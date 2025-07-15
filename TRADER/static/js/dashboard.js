@@ -408,27 +408,28 @@ function updateTable(results) {
     if (row) {
       // Update existing row
       row.cells[0].textContent = symbol;
-      row.cells[1].textContent = m.momentum?.toFixed(4) || '';
-      row.cells[2].textContent = m.buy_pressure?.toFixed(4) || '';
-      row.cells[3].textContent = m.sell_pressure?.toFixed(4) || '';
-      const signalCell = row.cells[4];
+      row.cells[1].textContent = m.binance_price !== undefined ? Number(m.binance_price).toFixed(4) : '';
+      row.cells[2].textContent = m.momentum?.toFixed(4) || '';
+      row.cells[3].textContent = m.buy_pressure?.toFixed(4) || '';
+      row.cells[4].textContent = m.sell_pressure?.toFixed(4) || '';
+      const signalCell = row.cells[5];
       signalCell.textContent = m.signal || '';
       signalCell.className = m.signal ? `signal-${m.signal.toLowerCase()}` : '';
-      row.cells[5].textContent = m.position || '';
-      const pnlCell = row.cells[6];
+      row.cells[6].textContent = m.position || '';
+      const pnlCell = row.cells[7];
       pnlCell.textContent = (typeof m.pnl_pct === 'number') ? `${m.pnl_pct.toFixed(4)}%` : '';
       pnlCell.className = ''; // Clear previous classes
       const pnlClass = m.pnl_pct > 0 ? 'positive-pnl' : m.pnl_pct < 0 ? 'negative-pnl' : null;
       if (pnlClass) pnlCell.classList.add(pnlClass);
-      row.cells[7].textContent = m.total_buy_trades ?? '';
-      row.cells[8].textContent = m.total_sell_trades ?? '';
-      const profitCell = row.cells[9];
+      row.cells[8].textContent = m.total_buy_trades ?? '';
+      row.cells[9].textContent = m.total_sell_trades ?? '';
+      const profitCell = row.cells[10];
       profitCell.textContent = m.total_profit?.toFixed(4) || '';
       profitCell.className = ''; // Clear previous classes
       const profitClass = m.total_profit > 0 ? 'positive-pnl' : m.total_profit < 0 ? 'negative-pnl' : null;
       if (profitClass) profitCell.classList.add(profitClass);
 
-      const btn = row.cells[10].querySelector('.transactions-button');
+      const btn = row.cells[11].querySelector('.transactions-button');
       if (btn) {
         if ((m.total_buy_trades ?? 0) === 0 && (m.total_sell_trades ?? 0) === 0) {
           btn.classList.add('disabled');
