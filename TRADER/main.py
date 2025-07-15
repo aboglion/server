@@ -63,7 +63,6 @@ def live_data():
         return jsonify({"error": "Failed to load live data"}), 500
     if not result:
         print("No data found, initializing with empty structure.")
-        print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<,")
         result = {}
         for symbol in Config.SYMBOLS:
             result[symbol] = {
@@ -115,13 +114,9 @@ def reset_all_trades():
     try:
         with open("reset.flag", "w") as f:
             f.write("1")
-        with coins_lock:
-            for coin in ALL_Coins.Coins:
-                coin.trade_manager.reset_trades()
-                coin.reset_coin()
     except Exception as e:
-        print(f"Error resetting trades: {e}\n{traceback.format_exc()}")
-        return {"error": "Failed to reset trades"}, 500
+        print(f"Error creating reset flag file: {e}\n{traceback.format_exc()}")
+        return {"error": "Failed to create reset flag file"}, 500
     return {"status": "all trades reset successfully"}
 
 @app.route("/api/n8n_hook", methods=["POST"])
