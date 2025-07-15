@@ -21,7 +21,7 @@ class Config:
     MIN_CONSEC_SIGNALS = 2  # Minimum consecutive signals to consider a trade
     FEE = 0.001
     TAKE_profit_PCT = 0.006 # 0.6% take profit
-    STOP_LOSS_PCT = 0.015 # 1.5% stop loss
+    STOP_LOSS_PCT = 0.02 # 2% stop loss
 
     DB_NAME = os.path.join(os.path.dirname(__file__), "dashboard_data", "DashboardData.db")
     PORT = 7070

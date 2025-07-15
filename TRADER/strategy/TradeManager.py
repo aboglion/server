@@ -1,3 +1,4 @@
+from sympy import false
 from CONFIG import Config, SignalType
 from dashboard_data.SQL_DB_DashboardData import SQL_DB_DashboardData
 
@@ -88,15 +89,19 @@ class TradeManager:
             return False
         self.coin.current_profit = (self.coin.binance_price - self.coin.buyed_price) / self.coin.buyed_price - (Config.FEE * 2)
         # print(f"[{self.coin.symbol}] Current Profit: {self.coin.current_profit:.6f} (Target TP: {Config.TAKE_profit_PCT}, SL: {Config.STOP_LOSS_PCT})")
-        if self.coin.current_profit >= Config.TAKE_profit_PCT:
+        
+        if self.coin.current_profit >= Config.TAKE_profit_PCT :
             print(f"[{self.coin.symbol}] Take Profit condition met.")
             return self.execute_sell("💰 TAKE_profit")
-        if self.coin.current_profit <= -Config.STOP_LOSS_PCT:
+
+        if self.coin.current_profit <= -Config.STOP_LOSS_PCT and self.coin.signal == SignalType.SELL.name:
             print(f"[{self.coin.symbol}] Stop Loss condition met.")
             return self.execute_sell("🛑 STOP_LOSS")
+        
         if self.coin.signal == SignalType.SELL.name and self.coin.current_profit >= 0 :
             print(f"[{self.coin.symbol}] Sell Signal condition met.")
             return self.execute_sell("📉 SELL_SIGNAL")
+        
         return False
 
     def _log(self, msg):

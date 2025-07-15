@@ -74,6 +74,11 @@ def reset_all_trades():
         for coin in ALL_Coins.Coins:
             coin.trade_manager.reset_trades()
             coin.reset_coin()
+    try:
+        SQL_DB_DashboardData.reset_trades_sqlite()
+    except Exception as e:
+        print(f"Error resetting trades: {e}\n{traceback.format_exc()}")
+        return {"error": "Failed to reset trades"}, 500
     return {"status": "all trades reset successfully"}
 
 @app.route("/api/n8n_hook", methods=["POST"])

@@ -265,7 +265,7 @@ class SQL_DB_DashboardData:
         conn = sqlite3.connect(Config.DB_NAME)
         c = conn.cursor()
         tables = [row[0] for row in c.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
-        for table in ["trades", "price_history", "okx_history", "stats"]:
+        for table in ["trades", "price_history", "binance_history", "bybit_history", "okx_history", "stats"]:
             if table in tables:
                 c.execute(f"DELETE FROM {table}")
         conn.commit()

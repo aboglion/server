@@ -442,6 +442,7 @@ function updateTable(results) {
       // Create new row
       row = tbody.insertRow();
       row.insertCell().textContent = symbol;
+      row.insertCell().textContent = metric.binance_price !== undefined ? Number(metric.binance_price).toFixed(4) : '';
       row.insertCell().textContent = m.momentum?.toFixed(4) || '';
       row.insertCell().textContent = m.buy_pressure?.toFixed(4) || '';
       row.insertCell().textContent = m.sell_pressure?.toFixed(4) || '';
