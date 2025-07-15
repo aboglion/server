@@ -75,12 +75,11 @@ def live_data():
             if result[symbol].get("momentum")== 0.0 and result[symbol].get("buy_pressure") == 0.0 and result[symbol].get("sell_pressure") == 0.0:
                 result[symbol].update({
                     "symbol": symbol,
-                    "binance_price": "אוסף נתונים",
-                    "momentum": "אוסף נתונים",
-                    "buy_pressure": "אוסף נתונים",
-                    "sell_pressure": "אוסף נתונים",
-                    "signal": "אוסף נתונים",
-                    "position": "אוסף נתונים",
+                    "momentum": 0.0,
+                    "buy_pressure": 0.0,
+                    "sell_pressure": 0.0,
+                    "signal": "No Signal",
+                    "position": "No Position",
                     "pnl_pct": 0.0,
                     "total_buy_trades": 0,
                     "total_sell_trades": 0,
