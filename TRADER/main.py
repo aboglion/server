@@ -79,7 +79,7 @@ def live_data():
                     "buy_pressure": 0.0,
                     "sell_pressure": 0.0,
                     "signal": "אוסף נתונים",
-                    "position": f"{(len(result[symbol].get('price_history', []))/{Config.HISTORY_LIMIT})*100:.2f}% ",
+                    "position": f"{(len(result[symbol].get('price_history', []))/Config.HISTORY_LIMIT)*100:.2f}% ",
                     "pnl_pct": 0.0,
                     "total_buy_trades": 0,
                     "total_sell_trades": 0,
