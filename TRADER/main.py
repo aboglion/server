@@ -69,7 +69,6 @@ def live_data():
                 "total_profit": 0.0,
                 "trades": []
             }
-        return jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL})
     if result[symbol].get("momentum") is None:
         for symbol in Config.SYMBOLS:
             result[symbol] = {
