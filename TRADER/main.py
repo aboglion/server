@@ -103,12 +103,12 @@ def get_transactions(symbol):
 @app.route("/api/reset_trades", methods=["POST"])
 def reset_all_trades():
     print("RESET TRADES API CALLED")
-    with coins_lock:
-        for coin in ALL_Coins.Coins:
-            coin.trade_manager.reset_trades()
-            coin.reset_coin()
     try:
-        SQL_DB_DashboardData.reset_trades_sqlite()
+        with coins_lock:
+            for coin in ALL_Coins.Coins:
+                coin.trade_manager.reset_trades()
+                coin.reset_coin()
+                SQL_DB_DashboardData.reset_trades_sqlite()
     except Exception as e:
         print(f"Error resetting trades: {e}\n{traceback.format_exc()}")
         return {"error": "Failed to reset trades"}, 500

@@ -259,15 +259,22 @@ class SQL_DB_DashboardData:
     def reset_trades_sqlite():
         """
         Reset all trades and graph data in the SQLite database.
-        Only deletes from tables that exist.
+        Deletes all rows from relevant tables and removes the database file.
         """
-        initialize_dashboard_db()
-        conn = sqlite3.connect(Config.DB_NAME)
-        c = conn.cursor()
-        tables = [row[0] for row in c.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
-        for table in ["trades", "price_history", "binance_history", "bybit_history", "okx_history", "stats"]:
-            if table in tables:
-                c.execute(f"DELETE FROM {table}")
-        conn.commit()
-        conn.close()
+        db_path = Config.DB_NAME
+        # Close any open connections before deleting
+        try:
+            conn = sqlite3.connect(db_path)
+            c = conn.cursor()
+            tables = [row[0] for row in c.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
+            for table in ["trades", "price_history", "binance_history", "bybit_history", "okx_history", "stats"]:
+                if table in tables:
+                    c.execute(f"DELETE FROM {table}")
+            conn.commit()
+            conn.close()
+        except Exception:
+            pass
+        # Remove the database file
+        if os.path.exists(db_path):
+            os.remove(db_path)
     
