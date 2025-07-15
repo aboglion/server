@@ -4,7 +4,7 @@ from dashboard_data.SQL_DB_DashboardData import SQL_DB_DashboardData
 from CONFIG import Config
 from COIN.coin_model import Coin, ALL_Coins
 from flask_cors import CORS
-import logging
+import logging, os
 from dashboard_data.SQL_DB_DashboardData import initialize_dashboard_db
 initialize_dashboard_db()
 
@@ -43,16 +43,21 @@ def dashboard():
 def ping():
     return {"status": "alive"}
 
-reset = False
 @app.route("/api/live", methods=["GET"])
 def live_data():
-    global reset
     try:
         with coins_lock:
-            if reset:
+            if os.path.exists("reset.flag"):
+                print("Reset flag file removed.")
+                # Reset trades for all coins
+                for coin in ALL_Coins.Coins:
+                    coin.trade_manager.reset_trades()
+                    coin.reset_coin()
                 SQL_DB_DashboardData.reset_trades_sqlite()
-                reset = False
-            result = SQL_DB_DashboardData.load_all_data(Config.SYMBOLS, Config.HISTORY_LIMIT)
+                os.remove("reset.flag")
+                result =None
+            else:
+                result = SQL_DB_DashboardData.load_all_data(Config.SYMBOLS, Config.HISTORY_LIMIT)
     except Exception as e:
         print(f"Error loading live data: {e}\n{traceback.format_exc()}")
         return jsonify({"error": "Failed to load live data"}), 500
@@ -107,16 +112,14 @@ def get_transactions(symbol):
 
 @app.route("/api/reset_trades", methods=["POST"])
 def reset_all_trades():
-    global reset
-    reset = True
     try:
+        with open("reset.flag", "w") as f:
+            f.write("1")
         with coins_lock:
             for coin in ALL_Coins.Coins:
                 coin.trade_manager.reset_trades()
                 coin.reset_coin()
-                SQL_DB_DashboardData.reset_trades_sqlite()
     except Exception as e:
-        reset = False
         print(f"Error resetting trades: {e}\n{traceback.format_exc()}")
         return {"error": "Failed to reset trades"}, 500
     return {"status": "all trades reset successfully"}
