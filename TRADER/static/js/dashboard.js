@@ -389,7 +389,6 @@ async function renderDashboard(clearBuySell = false) {
 function updateTable(results) {
   //resetRefreshProgress(); // Removed from here, now called in setInterval
   const tbody = document.getElementById('SQL_DB_DashboardData-table').getElementsByTagName('tbody')[0];
-  console.log("Updating table with results:", results);
   const existingRows = new Map();
   
   // Map existing rows by symbol
@@ -400,7 +399,8 @@ function updateTable(results) {
 
   const sortedSymbols = Object.keys(results).sort((a, b) => (a === "ALL" ? -1 : b === "ALL" ? 1 : a.localeCompare(b)));
   const fragment = document.createDocumentFragment();
-
+  console.log("Sorted symbols:", sortedSymbols);
+  
   for (const symbol of sortedSymbols) {
     if (symbol === 'ALL') continue;
     const m = results[symbol];
