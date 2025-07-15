@@ -52,7 +52,6 @@ def live_data():
         print(f"Error loading live data: {e}\n{traceback.format_exc()}")
         return jsonify({"error": "Failed to load live data"}), 500
     if not result:
-        # Return table with coin names and all expected fields as placeholder, as a dict
         result = {}
         for symbol in Config.SYMBOLS:
             result[symbol] = {
@@ -69,23 +68,23 @@ def live_data():
                 "total_profit": 0.0,
                 "trades": []
             }
-    if result[symbol].get("momentum") is None:
+    else:
         for symbol in Config.SYMBOLS:
-            result[symbol] = {
-                "symbol": symbol,
-                "binance_price": "אוסף נתונים",
-                "momentum": "אוסף נתונים",
-                "buy_pressure": "אוסף נתונים",
-                "sell_pressure": "אוסף נתונים",
-                "signal": "אוסף נתונים",
-                "position": "אוסף נתונים",
-                "pnl_pct": 0.0,
-                "total_buy_trades": 0,
-                "total_sell_trades": 0,
-                "total_profit": 0.0,
-                "trades": []
-            }
-        else:print(result[symbol].get("momentum"))
+            if result[symbol].get("momentum") is None:
+                result[symbol].update({
+                    "symbol": symbol,
+                    "binance_price": "אוסף נתונים",
+                    "momentum": "אוסף נתונים",
+                    "buy_pressure": "אוסף נתונים",
+                    "sell_pressure": "אוסף נתונים",
+                    "signal": "אוסף נתונים",
+                    "position": "אוסף נתונים",
+                    "pnl_pct": 0.0,
+                    "total_buy_trades": 0,
+                    "total_sell_trades": 0,
+                    "total_profit": 0.0,
+                    "trades": []
+            })
            
     return jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL})
 
