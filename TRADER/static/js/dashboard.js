@@ -320,9 +320,7 @@ window.dashboardChartInstances = window.dashboardChartInstances || {};
 
 // -- רנדר לוח בקרה --
 async function renderDashboard(clearBuySell = false) {
-  refreshElapsed = 0;
   const results = await fetchData();
-  refreshElapsed = 0;
 
   const chartContainer = document.getElementById('line-charts');
   
@@ -387,6 +385,9 @@ async function renderDashboard(clearBuySell = false) {
 
 // -- עדכון טבלת נתונים --
 function updateTable(results) {
+  
+    refreshElapsed = 0; // Reset elapsed time for progress bar
+
   //resetRefreshProgress(); // Removed from here, now called in setInterval
   const tbody = document.getElementById('SQL_DB_DashboardData-table').getElementsByTagName('tbody')[0];
   const existingRows = new Map();
