@@ -21,7 +21,7 @@ class SignalDecisionEngine:
         self.binance_price = 0.0  # Main reference price
         self.bybit_price = 0.0  # Secondary reference price
         self.okx_price = 0.0  # OKX reference price
-        self.last_signals = deque(maxlen=Config.Last_signals_len)  # Store last 5 signals
+        self.last_signals = deque(maxlen=Config.Last_signals_len)  
         self.last_decision = SignalType.NEUTRAL  # Last decision made by the engine
 
     def analyze(self, now=None):
@@ -95,25 +95,16 @@ class SignalDecisionEngine:
         if ((self.coin.is_in_bought_Position and signal_ == SignalType.BUY) or
             (not self.coin.is_in_bought_Position and signal_ == SignalType.SELL) or
              signal_ == SignalType.NEUTRAL):
-                self.recent_signals.append(signal_)
+                self.last_signals.append(signal_)
         else:
-            self.recent_signals.clear()
+            self.last_signals.clear()
 
-        if len(self.recent_signals) == Config.Last_signals_len:
-            postive_signals_count = len([s for s in self.recent_signals if s == SignalType.BUY])
-            negative_signals_count = len([s for s in self.recent_signals if s == SignalType.SELL])
-            print(f"[{self.coin.symbol}] Recent Signals: {self.recent_signals}, Positive: {postive_signals_count}, Negative: {negative_signals_count}")
-        else :
-            print(f"[{self.coin.symbol}] Recent Signals: {self.recent_signals} (Not enough signals yet)")
-            print( len(self.recent_signals) , Config.Last_signals_len)
-            postive_signals_count = 0
-            negative_signals_count = 0
-
-        if postive_signals_count > Config.MIN_CONSEC_SIGNALS_postive:
-            self.last_decision = SignalType.BUY
-        elif negative_signals_count > Config.MIN_CONSEC_SIGNALS_negative:
-            self.last_decision = SignalType.SELL
-        else:
-            self.last_decision = SignalType.NEUTRAL
+        if len(self.last_signals) == Config.Last_signals_len:
+            if self.last_signals.count(SignalType.BUY) > Config.MIN_CONSEC_SIGNALS_postive:
+                self.last_decision = SignalType.BUY
+            elif self.last_signals.count(SignalType.SELL) > Config.MIN_CONSEC_SIGNALS_negative:
+                self.last_decision = SignalType.SELL
+       
+        self.last_decision = SignalType.NEUTRAL
         return self.last_decision
 
