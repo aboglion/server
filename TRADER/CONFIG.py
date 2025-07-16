@@ -18,10 +18,11 @@ class Config:
     BASE_THRESHOLD = 1.12
     MAX_VOL_ADJ = 0.25 # Maximum volatility adjustment to the base threshold
     MIN_PCT_CHANGE = 0.00025  # Minimum price change to consider a trade
+
     MIN_CONSEC_SIGNALS = 2  # Minimum consecutive signals to consider a trade
-    FEE = 0.001
-    TAKE_profit_PCT = 0.006 # 0.6% take profit
-    STOP_LOSS_PCT = 0.02 # 2% stop loss
+    FEE = (0.15)/100  # Trading fee (0.15% for Binance, Bybit, OKX)
+    TAKE_profit_PCT = (0.6)/100 # 0.6% take profit (profit after fee)
+    STOP_LOSS_PCT = (1.7)/100 # 1.7% stop loss
 
     DB_NAME = os.path.join(os.path.dirname(__file__), "dashboard_data", "DashboardData.db")
     PORT = 7070

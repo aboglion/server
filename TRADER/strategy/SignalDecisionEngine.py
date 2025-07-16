@@ -98,7 +98,10 @@ class SignalDecisionEngine:
 
         if self.consecutive >= Config.MIN_CONSEC_SIGNALS:
             pct_change = abs(self.med_price - self.signal_price) / self.signal_price if self.signal_price > 0 else 0.0
-            self.last_decision = final if pct_change >= Config.MIN_PCT_CHANGE else SignalType.NEUTRAL
+            
+            #  sell => MIN_PCT_CHANGE*2 | buy => MIN_PCT_CHANGE
+            MIN_PCT_CHANGE=Config.MIN_PCT_CHANGE*2 if self.coin.is_in_bought_Position else Config.MIN_PCT_CHANGE
+            self.last_decision = final if pct_change >=MIN_PCT_CHANGE  else SignalType.NEUTRAL
             # print(f"[{self.coin.symbol}] Final Signal (consecutive): {self.last_decision}, Pct Change: {pct_change:.6f}, Required: {Config.MIN_PCT_CHANGE}")
         else:
             self.last_decision = SignalType.NEUTRAL
