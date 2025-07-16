@@ -13,7 +13,6 @@ class SignalDecisionEngine:
         self.current_signal = SignalType.NEUTRAL
         self.signal_price = 0.0
         self.consecutive = 0
-        self.last_decision = SignalType.NEUTRAL
         self.med_price = 0.0
         self.volatility = 0.0
         self.momentum = 0.0
@@ -22,6 +21,7 @@ class SignalDecisionEngine:
         self.binance_price = 0.0  # Main reference price
         self.bybit_price = 0.0  # Secondary reference price
         self.okx_price = 0.0  # OKX reference price
+        self.last_signals = deque(maxlen=Config.Last_signals_len)  # Store last 5 signals
 
     def analyze(self, now=None):
         from CONFIG import Config, SignalType # Import SignalType locally
@@ -58,8 +58,7 @@ class SignalDecisionEngine:
         # If med_price is still zero or negative after appending, return NEUTRAL
         if self.med_price <= 0:
             print(f"Average price is zero or negative ({self.med_price}). Not appending to history.")
-            self.last_decision = SignalType.NEUTRAL
-            return self.last_decision
+            return SignalType.NEUTRAL
 
         if self.coin.is_in_bought_Position and self.coin.buyed_price > 0:
             self.coin.current_profit = (self.med_price - self.coin.buyed_price) / self.coin.buyed_price
@@ -69,8 +68,7 @@ class SignalDecisionEngine:
         history_len = len(self.coin.med_price_history)
         # print(f"[{self.coin.symbol}] History Length: {history_len}, Required: {Config.VOLATILITY_WINDOW}")
         if history_len < Config.VOLATILITY_WINDOW:
-            self.last_decision = SignalType.NEUTRAL
-            return self.last_decision
+            return SignalType.NEUTRAL
 
 
         self.volatility = calc.calculate_volatility()
@@ -87,24 +85,28 @@ class SignalDecisionEngine:
         self.momentum = (self.recent_signals.count(SignalType.BUY) - self.recent_signals.count(SignalType.SELL)) / len(self.recent_signals)
         # print(f"[{self.coin.symbol}] Momentum: {self.momentum:.4f}")
 
-        final = SignalType.BUY if self.momentum > 0.5 else SignalType.SELL if self.momentum < -0.5 else SignalType.NEUTRAL
+        signal_ = SignalType.BUY if self.momentum > 0.5 else SignalType.SELL if self.momentum < -0.5 else SignalType.NEUTRAL
 
-        if final == self.current_signal:
-            self.consecutive += 1
+
+        
+        if ((self.coin.is_in_bought_Position and signal_ == SignalType.BUY) or
+            (not self.coin.is_in_bought_Position and signal_ == SignalType.SELL) or
+             signal_ == SignalType.NEUTRAL):
+                self.recent_signals.append(signal_)
         else:
-            self.current_signal = final
-            self.consecutive = 1
-            self.signal_price = self.med_price
+            self.recent_signals.clear()
 
-        if self.consecutive >= Config.MIN_CONSEC_SIGNALS:
-            pct_change = abs(self.med_price - self.signal_price) / self.signal_price if self.signal_price > 0 else 0.0
-            
-            #  sell => MIN_PCT_CHANGE*2 | buy => MIN_PCT_CHANGE
-            MIN_PCT_CHANGE=Config.MIN_PCT_CHANGE*2 if self.coin.is_in_bought_Position else Config.MIN_PCT_CHANGE
-            self.last_decision = final if pct_change >=MIN_PCT_CHANGE  else SignalType.NEUTRAL
-            # print(f"[{self.coin.symbol}] Final Signal (consecutive): {self.last_decision}, Pct Change: {pct_change:.6f}, Required: {Config.MIN_PCT_CHANGE}")
+        if len(self.recent_signals) == Config.Last_signals_len:
+            postive_signals_count = len([s for s in self.recent_signals if s == SignalType.BUY])
+            negative_signals_count = len([s for s in self.recent_signals if s == SignalType.SELL])
+        else :
+            postive_signals_count = 0
+            negative_signals_count = 0
+
+        if postive_signals_count > Config.MIN_CONSEC_SIGNALS_postive:
+            return SignalType.BUY
+        elif negative_signals_count > Config.MIN_CONSEC_SIGNALS_negative:
+            return SignalType.SELL
         else:
-            self.last_decision = SignalType.NEUTRAL
-            # print(f"[{self.coin.symbol}] Insufficient consecutive signals. Signal: {self.last_decision}")
+            return SignalType.NEUTRAL
 
-        return self.last_decision

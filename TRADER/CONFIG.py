@@ -17,9 +17,11 @@ class Config:
     VOLATILITY_WINDOW = int(HISTORY_LIMIT/2)  # Number of price points to calculate volatility
     BASE_THRESHOLD = 1.12
     MAX_VOL_ADJ = 0.25 # Maximum volatility adjustment to the base threshold
-    MIN_PCT_CHANGE = 0.00025  # Minimum price change to consider a trade
 
-    MIN_CONSEC_SIGNALS = 2  # Minimum consecutive signals to consider a trade
+    Last_signals_len=6 # Number of last signals to consider for momentum calculation
+    MIN_CONSEC_SIGNALS_postive = 3  # Minimum consecutive signals to consider a trade
+    MIN_CONSEC_SIGNALS_negative = 4  # Minimum consecutive signals to consider a trade
+    
     FEE = (0.15)/100  # Trading fee (0.15% for Binance, Bybit, OKX)
     TAKE_profit_PCT = (0.6)/100 # 0.6% take profit (profit after fee)
     STOP_LOSS_PCT = (1.7)/100 # 1.7% stop loss
