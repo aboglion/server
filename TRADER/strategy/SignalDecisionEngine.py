@@ -104,6 +104,8 @@ class SignalDecisionEngine:
             negative_signals_count = len([s for s in self.recent_signals if s == SignalType.SELL])
             print(f"[{self.coin.symbol}] Recent Signals: {self.recent_signals}, Positive: {postive_signals_count}, Negative: {negative_signals_count}")
         else :
+            print(f"[{self.coin.symbol}] Recent Signals: {self.recent_signals} (Not enough signals yet)")
+            print( len(self.recent_signals) , Config.Last_signals_len)
             postive_signals_count = 0
             negative_signals_count = 0
 
