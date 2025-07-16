@@ -18,7 +18,7 @@ class Config:
     BASE_THRESHOLD = 1.12
     MAX_VOL_ADJ = 0.25 # Maximum volatility adjustment to the base threshold
 
-    Last_signals_len=6 # Number of last signals to consider for momentum calculation
+    Last_signals_len=8 # Number of last signals to consider for momentum calculation
     MIN_CONSEC_SIGNALS_postive = 3  # Minimum consecutive signals to consider a trade
     MIN_CONSEC_SIGNALS_negative = 4  # Minimum consecutive signals to consider a trade
     

@@ -72,7 +72,7 @@ class SignalDecisionEngine:
         if history_len < Config.VOLATILITY_WINDOW:
             self.last_decision = SignalType.NEUTRAL
             return self.last_decision
-
+        
 
         self.volatility = calc.calculate_volatility()
         self.buy_pressure, self.sell_pressure = calc.calculate_pressure_ratios()
@@ -102,6 +102,7 @@ class SignalDecisionEngine:
         if len(self.recent_signals) == Config.Last_signals_len:
             postive_signals_count = len([s for s in self.recent_signals if s == SignalType.BUY])
             negative_signals_count = len([s for s in self.recent_signals if s == SignalType.SELL])
+            print(f"[{self.coin.symbol}] Recent Signals: {self.recent_signals}, Positive: {postive_signals_count}, Negative: {negative_signals_count}")
         else :
             postive_signals_count = 0
             negative_signals_count = 0
