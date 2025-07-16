@@ -22,6 +22,7 @@ class SignalDecisionEngine:
         self.bybit_price = 0.0  # Secondary reference price
         self.okx_price = 0.0  # OKX reference price
         self.last_signals = deque(maxlen=Config.Last_signals_len)  # Store last 5 signals
+        self.last_decision = SignalType.NEUTRAL  # Last decision made by the engine
 
     def analyze(self, now=None):
         from CONFIG import Config, SignalType # Import SignalType locally
@@ -58,6 +59,7 @@ class SignalDecisionEngine:
         # If med_price is still zero or negative after appending, return NEUTRAL
         if self.med_price <= 0:
             print(f"Average price is zero or negative ({self.med_price}). Not appending to history.")
+            self.last_decision = SignalType.NEUTRAL
             return SignalType.NEUTRAL
 
         if self.coin.is_in_bought_Position and self.coin.buyed_price > 0:
@@ -68,7 +70,8 @@ class SignalDecisionEngine:
         history_len = len(self.coin.med_price_history)
         # print(f"[{self.coin.symbol}] History Length: {history_len}, Required: {Config.VOLATILITY_WINDOW}")
         if history_len < Config.VOLATILITY_WINDOW:
-            return SignalType.NEUTRAL
+            self.last_decision = SignalType.NEUTRAL
+            return self.last_decision
 
 
         self.volatility = calc.calculate_volatility()
@@ -104,9 +107,10 @@ class SignalDecisionEngine:
             negative_signals_count = 0
 
         if postive_signals_count > Config.MIN_CONSEC_SIGNALS_postive:
-            return SignalType.BUY
+            self.last_decision = SignalType.BUY
         elif negative_signals_count > Config.MIN_CONSEC_SIGNALS_negative:
-            return SignalType.SELL
+            self.last_decision = SignalType.SELL
         else:
-            return SignalType.NEUTRAL
+            self.last_decision = SignalType.NEUTRAL
+        return self.last_decision
 
