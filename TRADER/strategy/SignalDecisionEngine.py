@@ -63,20 +63,17 @@ class SignalDecisionEngine:
             return SignalType.NEUTRAL
 
         if self.coin.is_in_bought_Position and self.coin.buyed_price > 0:
-            self.coin.current_profit = (self.med_price - self.coin.buyed_price) / self.coin.buyed_price
+            self.coin.current_profit = (self.coin.binance_price - self.coin.buyed_price) / self.coin.buyed_price - (Config.FEE * 2)
         else:
             self.coin.current_profit = 0.0
 
         history_len = len(self.coin.med_price_history)
-        # print(f"[{self.coin.symbol}] History Length: {history_len}, Required: {Config.VOLATILITY_WINDOW}")
         if history_len < Config.VOLATILITY_WINDOW:
             self.last_decision = SignalType.NEUTRAL
             return self.last_decision
-        
-
         self.volatility = calc.calculate_volatility()
+
         self.buy_pressure, self.sell_pressure = calc.calculate_pressure_ratios()
-        # print(f"[{self.coin.symbol}] Volatility: {self.volatility:.4f}, Buy Pressure: {self.buy_pressure:.4f}, Sell Pressure: {self.sell_pressure:.4f}")
 
         threshold = Config.BASE_THRESHOLD + min(self.volatility * 100, Config.MAX_VOL_ADJ) * (1 + self.momentum)
 
@@ -86,25 +83,23 @@ class SignalDecisionEngine:
 
         self.recent_signals.append(raw)
         self.momentum = (self.recent_signals.count(SignalType.BUY) - self.recent_signals.count(SignalType.SELL)) / len(self.recent_signals)
-        # print(f"[{self.coin.symbol}] Momentum: {self.momentum:.4f}")
-
         signal_ = SignalType.BUY if self.momentum > 0.5 else SignalType.SELL if self.momentum < -0.5 else SignalType.NEUTRAL
 
 
-        
-        if ((self.coin.is_in_bought_Position and signal_ == SignalType.BUY) or
-            (not self.coin.is_in_bought_Position and signal_ == SignalType.SELL) or
-             signal_ == SignalType.NEUTRAL):
-                self.last_signals.append(signal_)
+        # Check for consecutive signals shuld be sell/nuetral or buy/nuetral not sell/buy/neutral
+        if (signal_ == SignalType.BUY and SignalType.SELL in self.last_signals) or \
+            (signal_ == SignalType.SELL and SignalType.BUY in self.last_signals):
+                self.last_signals.clear()
         else:
-            self.last_signals.clear()
+            self.last_signals.append(signal_)
 
+        self.last_decision = SignalType.NEUTRAL
         if len(self.last_signals) == Config.Last_signals_len:
             if self.last_signals.count(SignalType.BUY) > Config.MIN_CONSEC_SIGNALS_postive:
                 self.last_decision = SignalType.BUY
             elif self.last_signals.count(SignalType.SELL) > Config.MIN_CONSEC_SIGNALS_negative:
                 self.last_decision = SignalType.SELL
+            
        
-        self.last_decision = SignalType.NEUTRAL
         return self.last_decision
 

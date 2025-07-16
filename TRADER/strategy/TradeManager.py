@@ -75,14 +75,12 @@ class TradeManager:
         #-----------------------------------------------------------
 
 #------------------------------------------------------------
+#>>#--------------| Sell cond |-------------------------
     def check_selling_cond(self):
         if not self.coin.is_in_bought_Position or self.coin.buyed_price <= 0:
             # print(f"[{self.coin.symbol}] Not checking sell conditions: Not in bought position or buyed price is zero.")
             return False
-        self.coin.current_profit = (self.coin.binance_price - self.coin.buyed_price) / self.coin.buyed_price - (Config.FEE * 2)
-        # print(f"[{self.coin.symbol}] Current Profit: {self.coin.current_profit:.6f} (Target TP: {Config.TAKE_profit_PCT}, SL: {Config.STOP_LOSS_PCT})")
         
-#>>#--------------| Sell cond |-------------------------
         if self.coin.current_profit >= Config.TAKE_profit_PCT and self.coin.signal != SignalType.BUY.name:
             print(f"[{self.coin.symbol}] Take Profit condition met.")
             return self.execute_sell("💰 TAKE_profit")
