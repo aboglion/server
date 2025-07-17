@@ -11,17 +11,16 @@ class Config:
     SYMBOLS =  ["BTCUSDT", "ETHUSDT", "XRPUSDT", "SOLUSDT"]
 
     CYCLE_INTERVAL = 10  # Interval in seconds for processing coins
-    HISTORY_LIMIT = int((7*60)/CYCLE_INTERVAL)  # Default retention time for graph data (7 minutes)
+    HISTORY_LIMIT = int((10*60)/CYCLE_INTERVAL)  # Default retention time for graph data (10 minutes)
 
-    MOMENTUM_WINDOW = int(HISTORY_LIMIT/4)
-    VOLATILITY_WINDOW = int(HISTORY_LIMIT/2)  # Number of price points to calculate volatility
+    VOLATILITY_WINDOW = int(HISTORY_LIMIT/1.33)  # Number of price points to calculate volatility
     BASE_THRESHOLD = 1.12
     MAX_VOL_ADJ = 0.25 # Maximum volatility adjustment to the base threshold
 
-    Last_signals_len=6 # Number of last signals to consider for momentum calculation
+    recent_signals_len=10 # Number of last signals to consider for momentum calculation
     MIN_CONSEC_SIGNALS_postive = 3  # Minimum consecutive signals to consider a trade
-    MIN_CONSEC_SIGNALS_negative = 4  # Minimum consecutive signals to consider a trade
-    
+    MIN_CONSEC_SIGNALS_negative = 5  # Minimum consecutive signals to consider a trade
+
     FEE = (0.15)/100  # Trading fee (0.15% for Binance, Bybit, OKX)
     TAKE_profit_PCT = (0.6)/100 # 0.6% take profit (profit after fee)
     STOP_LOSS_PCT = (1.7)/100 # 1.7% stop loss
