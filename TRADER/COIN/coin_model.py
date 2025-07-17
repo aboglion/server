@@ -138,7 +138,7 @@ class Coin:
 
 
     def restore_status_data(self):
-        db_path = os.path.join("LOGS","", f"{self.symbol}_status_data.db")
+        db_path = os.path.join("LOGS",f"{self.symbol}_status_data.db")
         if not os.path.exists(db_path):
             return False
         conn = sqlite3.connect(db_path)
@@ -158,7 +158,7 @@ class Coin:
             return False
 
     def save_status_data(self):
-        db_path = os.path.join("LOGS","", f"{self.symbol}_status_data.db")
+        db_path = os.path.join("LOGS",f"{self.symbol}_status_data.db")
         db_created = not os.path.exists(db_path)
         conn = sqlite3.connect(db_path)
         c = conn.cursor()
