@@ -169,7 +169,8 @@ class Coin:
         row = c.fetchone()
         conn.close()
         if row:
-            self.buyed_price, self.is_in_bought_Position, self.total_profit, self.last_time_str = row
+            self.buyed_price, is_in_bought_Position, self.total_profit, self.last_time_str = row
+            self.is_in_bought_Position = bool(is_in_bought_Position)
             return True
         else:
             print(f"No status data found for {self.symbol} in {db_path}")
@@ -187,6 +188,12 @@ class Coin:
             SET buyed_price = ?, is_in_bought_Position = ?, total_profit = ?, last_time_str = ?
             WHERE symbol = ?
         """, (self.buyed_price, int(self.is_in_bought_Position), self.total_profit, self.last_time_str, self.symbol))
+        if c.rowcount == 0:
+            # No row updated, insert new row
+            c.execute("""
+                INSERT INTO status_data_main_table (symbol, buyed_price, is_in_bought_Position, total_profit, last_time_str)
+                VALUES (?, ?, ?, ?, ?)
+            """, (self.symbol, self.buyed_price, int(self.is_in_bought_Position), self.total_profit, self.last_time_str))
         conn.commit()
         conn.close()
 
