@@ -21,8 +21,8 @@ class SignalDecisionEngine:
         self.bybit_price = 0.0  # Secondary reference price
         self.okx_price = 0.0  # OKX reference price
         self.recent_signals = deque(maxlen=Config.recent_signals_len)  
-        self.recent_buy_pressure = deque(maxlen=Config.recent_signals_len)
-        self.recent_sell_pressure = deque(maxlen=Config.recent_signals_len)
+        self.recent_buy_pressure = deque(maxlen=Config.recent_pressure_len)
+        self.recent_sell_pressure = deque(maxlen=Config.recent_pressure_len)
         self.last_decision = SignalType.NEUTRAL  # Last decision made by the engine
 
 
@@ -78,7 +78,7 @@ class SignalDecisionEngine:
         self.buy_pressure, self.sell_pressure = calc.calculate_pressure_ratios()
         self.recent_buy_pressure.append(self.buy_pressure)
         self.recent_sell_pressure.append(self.sell_pressure)    
-        if len(self.recent_buy_pressure) < Config.recent_signals_len or len(self.recent_sell_pressure) < Config.recent_signals_len:
+        if len(self.recent_buy_pressure) < Config.recent_pressure_len or len(self.recent_sell_pressure) < Config.recent_pressure_len:
             self.last_decision = SignalType.NEUTRAL
             return self.last_decision
         # Calculate the median of buy and sell pressures
