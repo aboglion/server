@@ -9,6 +9,11 @@ help:
 	@echo "  make logs-<service>    -- צפייה בלוגים של קונטיינר"
 	@echo "  make update            -- עדכון כל הפרויקט מגיט"
 	@echo "  make clean             -- ניקוי אימג'ים שלא בהרצה"
+	@echo "  make clean-all         -- ניקוי כל הקונטיינרים והאימג'ים"
+	@echo "  make format            -- ניקוי כל הקונטיינרים, האימג'ים והווליום"
+	@echo "  make push              -- דחיפת שינויים לגיט"
+	@echo "  make del_trader_logs   -- מחיקת כל הלוגים של trader"	
+	@echo "  make pull              -- עדכון הפרויקט מהמאגר"
 	@echo ""
 
 up:
