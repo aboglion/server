@@ -89,8 +89,9 @@ class SignalDecisionEngine:
         # Calculate the median of buy and sell pressures
         self.buy_pressure = statistics.median(self.recent_buy_pressure)
         self.sell_pressure = statistics.median(self.recent_sell_pressure)
-        Volume_median_PART1= statistics.median(self.recent_Volumes[:int(Config.recent_Volumes_len/2)+1] )
-        Volume_median_PART2= statistics.median(self.recent_Volumes[int(Config.recent_Volumes_len/2):] )
+        recent_volumes_list = list(self.recent_Volumes)
+        Volume_median_PART1 = statistics.median(recent_volumes_list[:int(Config.recent_Volumes_len/2)+1])
+        Volume_median_PART2 = statistics.median(recent_volumes_list[int(Config.recent_Volumes_len/2):])
 
         volume_factor = (Volume_median_PART2 - Volume_median_PART1)/ Volume_median_PART2 if Volume_median_PART2 > 0 else 0.0
         vol_factor = min(self.volatility, 0.05)  # מגביל תנודתיות קיצונית
