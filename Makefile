@@ -90,10 +90,3 @@ del_trader_logs:
 	rm -rf ../data_backup/TRADER/LOGS/*
 	@echo "Logs deleted successfully."
 
-data_trade:
-	@echo "Data directories set to ../data_backup/TRADER/LOGS"
-	cd ../data_backup/TRADER/LOGS
-
-data_n8n:
-	@echo "Data directories set to ../data_backup/n8n_data"
-	cd ../data_backup/n8n_data
