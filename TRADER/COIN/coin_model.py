@@ -47,7 +47,7 @@ class Coin:
         self.signal = "UNKNOWN"
         self.last_time_str = ""
         ALL_Coins.Coins.append(self)  # Add this coin to the static list
-        self.restore_status_data(self)
+        self.restore_status_data()
 
 
 #####################################################################
