@@ -14,7 +14,7 @@ class Config:
     HISTORY_LIMIT = int((10*60)/CYCLE_INTERVAL)  # Default retention time for graph data (10 minutes)
 
     VOLATILITY_WINDOW = int(HISTORY_LIMIT/1.33)  # Number of price points to calculate volatility
-    BASE_THRESHOLD = 1.12
+    BASE_THRESHOLD = 0.6 #1.12
     MAX_VOL_ADJ = 0.25 # Maximum volatility adjustment to the base threshold
 
     recent_signals_len=10 # Number of last signals to consider for momentum calculation
@@ -30,6 +30,8 @@ class Config:
     DEBUG = True
     # Initialize the database if it doesn't exist
     
+
+
 
 # =====================================================
 # איתותים

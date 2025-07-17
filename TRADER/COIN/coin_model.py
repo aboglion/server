@@ -143,6 +143,8 @@ class Coin:
             return False
         conn = sqlite3.connect(db_path)
         c = conn.cursor()
+        # Ensure table exists before SELECT
+
         c.execute("""
             SELECT buyed_price, is_in_bought_Position, total_profit, last_time_str
             FROM status_data_main_table
@@ -159,11 +161,10 @@ class Coin:
 
     def save_status_data(self):
         db_path = os.path.join("LOGS",f"{self.symbol}_status_data.db")
-        db_created = not os.path.exists(db_path)
         conn = sqlite3.connect(db_path)
         c = conn.cursor()
-        if not db_created:
-            c.execute("""
+        # Ensure table exists before INSERT or UPDATE
+        c.execute("""
                 CREATE TABLE IF NOT EXISTS status_data_main_table (
                     symbol TEXT, PRIMARY KEY AUTOINCREMENT,
                     buyed_price REAL DEFAULT 0.0,
@@ -172,7 +173,7 @@ class Coin:
                     last_time_str TEXT DEFAULT "",
                 )
             """)
-            time.sleep(0.1)
+        time.sleep(0.1)
         c.execute("""
             UPDATE status_data_main_table
             SET buyed_price = ?, is_in_bought_Position = ?, total_profit = ?, last_time_str = ?

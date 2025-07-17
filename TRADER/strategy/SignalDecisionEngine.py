@@ -74,11 +74,15 @@ class SignalDecisionEngine:
 
         self.buy_pressure, self.sell_pressure = calc.calculate_pressure_ratios()
 
-        threshold = Config.BASE_THRESHOLD + min(self.volatility * 100, Config.MAX_VOL_ADJ) * (1 + self.momentum)
+        vol_factor = min(self.volatility, 0.05)  # מגביל תנודתיות קיצונית
+        momentum_adj = max(0.0, 0.5 + self.momentum)  # לא יורד מתחת ל־0.5
+        threshold = Config.BASE_THRESHOLD + (vol_factor * 10) * momentum_adj
 
         signal_ = SignalType.NEUTRAL
-        if self.buy_pressure > threshold: signal_ = SignalType.BUY
-        elif self.sell_pressure > threshold: signal_ = SignalType.SELL
+        if self.buy_pressure > threshold and self.buy_pressure > self.sell_pressure:
+            signal_ = SignalType.BUY
+        elif self.sell_pressure > threshold and self.sell_pressure > self.buy_pressure:
+            signal_ = SignalType.SELL
 
 
         # Check for consecutive signals shuld be sell/nuetral or buy/nuetral not sell/buy/neutral
@@ -89,7 +93,7 @@ class SignalDecisionEngine:
 
         postive_signals = self.recent_signals.count(SignalType.BUY)
         negative_signals = self.recent_signals.count(SignalType.SELL)
-        print(f" {self.coin.symbol} - Postive: {postive_signals}, Negative: {negative_signals},\n Recent Signals: {list(self.recent_signals)}\n {(postive_signals - negative_signals) / len(self.recent_signals) if len(self.recent_signals) > 0 else 0.0}\n","="*20)
+        # print(f" {self.coin.symbol} - Postive: {postive_signals}, Negative: {negative_signals},\n Recent Signals: {list(self.recent_signals)}\n {(postive_signals - negative_signals) / len(self.recent_signals) if len(self.recent_signals) > 0 else 0.0}\n","="*20)
         if len(self.recent_signals) > min(Config.MIN_CONSEC_SIGNALS_postive, Config.MIN_CONSEC_SIGNALS_negative):
             self.momentum = (postive_signals - negative_signals) / len(self.recent_signals)
         else:
