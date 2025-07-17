@@ -87,22 +87,22 @@ class SignalDecisionEngine:
                 self.last_decision = SignalType.NEUTRAL
                 return self.last_decision
         # Calculate the median of buy and sell pressures
-        self.buy_pressure = statistics.median(self.recent_buy_pressure)
-        self.sell_pressure = statistics.median(self.recent_sell_pressure)
         recent_volumes_list = list(self.recent_Volumes)
         Volume_median_PART1 = statistics.median(recent_volumes_list[:int(Config.recent_Volumes_len/2)+1])
         Volume_median_PART2 = statistics.median(recent_volumes_list[int(Config.recent_Volumes_len/2):])
+        volume_factor = ((Volume_median_PART2 - Volume_median_PART1)/ Volume_median_PART2)*10 if Volume_median_PART2 > 0 else 0.0
+        self.buy_pressure = statistics.median(self.recent_buy_pressure)+volume_factor 
+        self.sell_pressure = statistics.median(self.recent_sell_pressure)+volume_factor 
 
-        volume_factor = (Volume_median_PART2 - Volume_median_PART1)/ Volume_median_PART2 if Volume_median_PART2 > 0 else 0.0
         vol_factor = min(self.volatility, 0.05)  # מגביל תנודתיות קיצונית
-        momentum_adj = max(0.0, 0.5 + self.momentum)  # לא יורד מתחת ל־0.5
-        threshold = Config.BASE_THRESHOLD + (vol_factor * 10) * momentum_adj + (volume_factor * 10)
-        print("coin:",self.coin.symbol,vol_factor * 10, momentum_adj, volume_factor * 10,"\n","#"*20)
+        momentum_adj = max(0.0, 1 + self.momentum)  # לא יורד מתחת ל־1
+
+        threshold = Config.BASE_THRESHOLD + (vol_factor * 10) * momentum_adj 
         # print(f"thereshold: {threshold}, self.buy_pressure: {self.buy_pressure}, self.sell_pressure: {self.sell_pressure}")
         signal_ = SignalType.NEUTRAL
         if self.buy_pressure > threshold and self.buy_pressure > self.sell_pressure:
             signal_ = SignalType.BUY
-        elif self.sell_pressure > threshold and self.sell_pressure > self.buy_pressure:
+        elif self.sell_pressure +(volume_factor * 10)> threshold and self.sell_pressure > self.buy_pressure:
             signal_ = SignalType.SELL
 
 
