@@ -147,7 +147,7 @@ class Coin:
                     buyed_price REAL DEFAULT 0.0,
                     is_in_bought_Position INTEGER DEFAULT 0,
                     total_profit REAL DEFAULT 0.0,
-                    last_time_str TEXT DEFAULT "",
+                    last_time_str TEXT DEFAULT ""
                 )
             """)
         conn.commit()
