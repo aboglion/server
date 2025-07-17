@@ -77,7 +77,7 @@ class SignalDecisionEngine:
         vol_factor = min(self.volatility, 0.05)  # מגביל תנודתיות קיצונית
         momentum_adj = max(0.0, 0.5 + self.momentum)  # לא יורד מתחת ל־0.5
         threshold = Config.BASE_THRESHOLD + (vol_factor * 10) * momentum_adj
-
+        print(f"thereshold: {threshold}, self.buy_pressure: {self.buy_pressure}, self.sell_pressure: {self.sell_pressure}")
         signal_ = SignalType.NEUTRAL
         if self.buy_pressure > threshold and self.buy_pressure > self.sell_pressure:
             signal_ = SignalType.BUY
