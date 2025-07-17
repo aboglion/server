@@ -58,6 +58,15 @@ h2 {
   position: relative;
 }
 
+/* Visually separate trades table rows with shadow and extra padding */
+#SQL_DB_DashboardData-table tbody tr {
+  background: #232323;
+  box-shadow: 0 4px 12px #00e5ff22;
+}
+#SQL_DB_DashboardData-table th, #SQL_DB_DashboardData-table td {
+  padding: 18px 8px;
+  text-align: center;
+}
 #table-container, #charts-section {
   margin: 20px auto;
   width: 95%;

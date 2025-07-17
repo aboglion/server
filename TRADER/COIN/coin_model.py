@@ -142,7 +142,8 @@ class Coin:
         # Ensure table exists before INSERT or UPDATE
         c.execute("""
                 CREATE TABLE IF NOT EXISTS status_data_main_table (
-                    symbol TEXT, PRIMARY KEY AUTOINCREMENT,
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    symbol TEXT,
                     buyed_price REAL DEFAULT 0.0,
                     is_in_bought_Position INTEGER DEFAULT 0,
                     total_profit REAL DEFAULT 0.0,

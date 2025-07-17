@@ -226,13 +226,20 @@ class SQL_DB_DashboardData:
         initialize_dashboard_db()
         conn = sqlite3.connect(Config.DB_NAME)
         c = conn.cursor()
+
+        # חישוב רווח לעסקת מכירה
+        if action.lower() == "sell":
+            net_profit = (coin.binance_price - coin.buyed_price) / coin.buyed_price - (Config.FEE * 2)
+        else:
+            net_profit = None
+
         c.execute(
-            "INSERT INTO trades (symbol, action, price, timestamp, reason, signal) VALUES (?, ?, ?, ?, ?, ?)",
-            (coin.symbol, action, coin.binance_price, coin.last_time_str, reason, coin.signal)
+            "INSERT INTO trades (symbol, action, price, timestamp, reason, signal, net_profit) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (coin.symbol, action, coin.binance_price, coin.last_time_str, reason, coin.signal, net_profit)
         )
         conn.commit()
         # Log progress after recording a trade
-        print(f"Trade recorded: {action} {coin.symbol} at {coin.binance_price} on {coin.last_time_str}")
+        print(f"Trade recorded: {action} {coin.symbol} at {coin.binance_price} on {coin.last_time_str} | net_profit={net_profit}")
         conn.close()
 
     
