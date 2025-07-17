@@ -133,8 +133,9 @@ print("Initializing coins...")
 try:
     for symbol in Config.SYMBOLS:
         Coin(symbol)
-    SQL_DB_DashboardData.restore_all_data()
-    print(f"Successfully initialized coins: {Config.SYMBOLS}")
+    for coin in ALL_Coins.Coins:
+        print(f"Successfully initialized coin: {coin.symbol}")
+        coin.restore_status_data()
 except Exception as e:
     print(f"Error initializing coins: {e}\n{traceback.format_exc()}")
 

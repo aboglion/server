@@ -47,7 +47,7 @@ class Coin:
         self.signal = "UNKNOWN"
         self.last_time_str = ""
         ALL_Coins.Coins.append(self)  # Add this coin to the static list
-        self.restore_status_data()
+        
 
 
 #####################################################################
@@ -171,6 +171,7 @@ class Coin:
         if row:
             self.buyed_price, is_in_bought_Position, self.total_profit, self.last_time_str = row
             self.is_in_bought_Position = bool(is_in_bought_Position)
+            print(f"Restored status data for {self.symbol}: buyed_price={self.buyed_price}, is_in_bought_Position={self.is_in_bought_Position}, total_profit={self.total_profit}, last_time_str={self.last_time_str}")
             return True
         else:
             print(f"No status data found for {self.symbol} in {db_path}")
