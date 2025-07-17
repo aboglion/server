@@ -546,9 +546,7 @@ async function displayTransactions(symbol) {
       transactions.forEach(tx => {
         let profit = tx.net_profit !== undefined && tx.net_profit !== null ? (tx.net_profit * 100).toFixed(2) + "%" : '';
         let profitClass = "";
-        let p = "";
         if (typeof tx.net_profit === "number") {
-          p="%";
           if (tx.net_profit > 0) profitClass = "positive-pnl";
           else if (tx.net_profit < 0) profitClass = "negative-pnl";
         }
@@ -558,7 +556,7 @@ async function displayTransactions(symbol) {
           <td>${tx.timestamp ?? ''}</td>
           <td>${tx.reason ?? ''}</td>
           <td>${tx.signal ?? ''}</td>
-          <td class="${profitClass}">${profit}${p}</td>
+          <td class="${profitClass}">${profit}</td>
         </tr>`;
       });
       html += `</table>`;
