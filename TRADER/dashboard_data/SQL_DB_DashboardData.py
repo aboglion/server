@@ -1,5 +1,6 @@
 import sqlite3
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from CONFIG import Config
 import os
 
@@ -139,7 +140,6 @@ class SQL_DB_DashboardData:
     
  
 
-    # שאר הפונקציות נשארות ללא שינוי
     @staticmethod
     def load_all_data(symbols, history_limit=200):
         initialize_dashboard_db()
@@ -252,7 +252,7 @@ class SQL_DB_DashboardData:
 
     @staticmethod
     def print_exchange_error(exchange_name: str, error_message: str):
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        timestamp = datetime.now(ZoneInfo("Asia/Jerusalem")).strftime("%Y-%m-%d %H:%M:%S")
         print(f"[{timestamp}] {exchange_name.upper()} ERROR: {error_message}")
 
     @staticmethod

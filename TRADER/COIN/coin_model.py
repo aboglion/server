@@ -1,5 +1,6 @@
-import time
+import time,os,sqlite3
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from CONFIG import Config
 from strategy.SignalDecisionEngine import SignalDecisionEngine
 from strategy.TradeManager import TradeManager
@@ -46,8 +47,7 @@ class Coin:
         self.signal = "UNKNOWN"
         self.last_time_str = ""
         ALL_Coins.Coins.append(self)  # Add this coin to the static list
-        
-
+        self.restore_status_data(self)
 
 
 #####################################################################
@@ -78,7 +78,7 @@ class Coin:
             for ex, connector in Config.EXCHANGES.items():
                 try:
                     self.orderbooks[ex] = connector.fetch(self.symbol)
-                    self.last_time_str = datetime.fromtimestamp(now).strftime("%H:%M:%S")
+                    self.last_time_str = datetime.fromtimestamp(now, ZoneInfo("Asia/Jerusalem")).strftime("%H:%M:%S")
                     fanched = True
                 except Exception as e:
                     print(f"Coin.process_coin: Error fetching data from {ex} for {self.symbol}: {e}")
@@ -132,8 +132,55 @@ class Coin:
             self.bybit_price = 0.0
             self.okx_price = 0.0
             self.signal = "ERROR"
-            self.last_time_str = datetime.now().strftime("%H:%M:%S")
+            self.last_time_str = datetime.now(ZoneInfo("Asia/Jerusalem")).strftime("%H:%M:%S")
             # No return statement here anymore
+
+
+
+    def restore_status_data(self):
+        db_path = os.path.join("LOGS","", f"{self.symbol}_status_data.db")
+        if not os.path.exists(db_path):
+            return False
+        conn = sqlite3.connect(db_path)
+        c = conn.cursor()
+        c.execute("""
+            SELECT buyed_price, is_in_bought_Position, total_profit, last_time_str
+            FROM status_data_main_table
+            WHERE symbol = ?
+        """, (self.symbol,))
+        row = c.fetchone()
+        conn.close()
+        if row:
+            self.buyed_price, self.is_in_bought_Position, self.total_profit, self.last_time_str = row
+            return True
+        else:
+            print(f"No status data found for {self.symbol} in {db_path}")
+            return False
+
+    def save_status_data(self):
+        self.initialize_status_data()
+        db_path = os.path.join("LOGS","", f"{self.symbol}_status_data.db")
+        db_created = not os.path.exists(db_path)
+        conn = sqlite3.connect(db_path)
+        c = conn.cursor()
+        if not db_created:
+            c.execute("""
+                CREATE TABLE IF NOT EXISTS status_data_main_table (
+                    symbol TEXT, PRIMARY KEY AUTOINCREMENT,
+                    buyed_price REAL DEFAULT 0.0,
+                    is_in_bought_Position INTEGER DEFAULT 0,
+                    total_profit REAL DEFAULT 0.0,
+                    last_time_str TEXT DEFAULT "",
+                )
+            """)
+            time.sleep(0.1)
+        c.execute("""
+            UPDATE status_data_main_table
+            SET buyed_price = ?, is_in_bought_Position = ?, total_profit = ?, last_time_str = ?
+            WHERE symbol = ?
+        """, (self.buyed_price, int(self.is_in_bought_Position), self.total_profit, self.last_time_str, self.symbol))
+        conn.commit()
+        conn.close()
 
 
 ##########################################################

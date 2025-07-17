@@ -85,3 +85,7 @@ push:
 	git commit -m "Update Makefile and docker-compose.yml"
 	git push origin main
 	@echo "Changes pushed to the repository."
+
+del_trader_logs:
+	rm -rf ../data_backup/TRADER/LOGS/*
+	@echo "Logs deleted successfully."

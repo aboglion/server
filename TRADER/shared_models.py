@@ -4,6 +4,7 @@
 
 import  time, json, sqlite3
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 
 # =====================================================
@@ -79,4 +80,4 @@ class DBManager:
             conn.commit()
 
     def generate_run_key(self):
-        return datetime.now().strftime("%Y%m%d_%H%M%S")
+        return datetime.now(ZoneInfo("Asia/Jerusalem")).strftime("%Y%m%d_%H%M%S")

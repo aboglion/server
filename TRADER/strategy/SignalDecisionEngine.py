@@ -90,11 +90,12 @@ class SignalDecisionEngine:
         postive_signals = self.recent_signals.count(SignalType.BUY)
         negative_signals = self.recent_signals.count(SignalType.SELL)
 
-        if len(self.recent_signals) == 0:
-            self.momentum = 0.0
-        else:
+        if len(self.recent_signals) > min(Config.MIN_CONSEC_SIGNALS_postive, Config.MIN_CONSEC_SIGNALS_negative):
             self.momentum = (postive_signals - negative_signals) / len(self.recent_signals)
-
+        else:
+            self.momentum = 0.0
+        print(f"[{self.coin.symbol}] Momentum: {self.momentum:.4f}, postive: {postive_signals}, negative: {negative_signals}, recent signals: {list(self.recent_signals)}")
+        print("="*20)
         self.last_decision = SignalType.NEUTRAL
         if len(self.recent_signals) == Config.recent_signals_len:
             if postive_signals > Config.MIN_CONSEC_SIGNALS_postive:

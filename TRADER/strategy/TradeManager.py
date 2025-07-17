@@ -48,7 +48,7 @@ class TradeManager:
                 if self.execute_buy():
                     msg = f"[{self.coin.last_time_str}] BUY @ {self.coin.binance_price:.4f} | Signal: {self.coin.signal}"
                     self._log(msg)
-                    
+                    self.coin.save_status_data()
                     return True
                 else:
                     print(f"[{self.coin.symbol}] Buy execution failed.")
@@ -69,6 +69,8 @@ class TradeManager:
             print(f"[{self.coin.symbol}] Executing BUY. Total Buy Trades: {self.coin.total_buy_trades}")
             # דיווח עסקה ל-SQLite
             SQL_DB_DashboardData.record_trade(self.coin, "BUY", "🟢 BUY_SIGNAL")
+            self.coin.save_status_data()
+
             return True
         print(f"[{self.coin.symbol}] Not executing BUY: Already in position.")
         return False

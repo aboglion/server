@@ -28,8 +28,8 @@ class Config:
     DB_NAME = os.path.join(os.path.dirname(__file__), "dashboard_data", "DashboardData.db")
     PORT = 7070
     DEBUG = True
-
-
+    # Initialize the database if it doesn't exist
+    
 
 # =====================================================
 # איתותים
