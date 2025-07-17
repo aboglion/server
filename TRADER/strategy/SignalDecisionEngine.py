@@ -23,8 +23,8 @@ class SignalDecisionEngine:
         self.recent_signals = deque(maxlen=Config.recent_signals_len)  
         self.recent_buy_pressure = deque(maxlen=Config.recent_pressure_len)
         self.recent_sell_pressure = deque(maxlen=Config.recent_pressure_len)
+        self.recent_Volumes = deque(maxlen=Config.recent_Volumes_len)
         self.last_decision = SignalType.NEUTRAL  # Last decision made by the engine
-
 
     def analyze(self, now=None):
         from CONFIG import Config, SignalType # Import SignalType locally
@@ -76,19 +76,28 @@ class SignalDecisionEngine:
         self.volatility = calc.calculate_volatility()
 
         self.buy_pressure, self.sell_pressure = calc.calculate_pressure_ratios()
+        last_Volume= calc.calculate_Volume()
         self.recent_buy_pressure.append(self.buy_pressure)
         self.recent_sell_pressure.append(self.sell_pressure)    
-        if len(self.recent_buy_pressure) < Config.recent_pressure_len or len(self.recent_sell_pressure) < Config.recent_pressure_len:
-            self.last_decision = SignalType.NEUTRAL
-            return self.last_decision
+        self.recent_Volumes.append(last_Volume)
+
+        if  len(self.recent_buy_pressure) < Config.recent_pressure_len or \
+            len(self.recent_sell_pressure) < Config.recent_pressure_len or \
+            len(self.recent_Volumes) < Config.recent_Volumes_len:
+                self.last_decision = SignalType.NEUTRAL
+                return self.last_decision
         # Calculate the median of buy and sell pressures
         self.buy_pressure = statistics.median(self.recent_buy_pressure)
         self.sell_pressure = statistics.median(self.recent_sell_pressure)
+        Volume_median_PART1= statistics.median(self.recent_Volumes[:int(Config.recent_Volumes_len/2)+1] )
+        Volume_median_PART2= statistics.median(self.recent_Volumes[int(Config.recent_Volumes_len/2):] )
 
+        volume_factor = (Volume_median_PART2 - Volume_median_PART1)/ Volume_median_PART2 if Volume_median_PART2 > 0 else 0.0
         vol_factor = min(self.volatility, 0.05)  # מגביל תנודתיות קיצונית
         momentum_adj = max(0.0, 0.5 + self.momentum)  # לא יורד מתחת ל־0.5
-        threshold = Config.BASE_THRESHOLD + (vol_factor * 10) * momentum_adj
-        print(f"thereshold: {threshold}, self.buy_pressure: {self.buy_pressure}, self.sell_pressure: {self.sell_pressure}")
+        threshold = Config.BASE_THRESHOLD + (vol_factor * 10) * momentum_adj + (volume_factor * 10)
+        print("coin:",self.coin.symbol,vol_factor * 10, momentum_adj, volume_factor * 10,"\n","#"*20)
+        # print(f"thereshold: {threshold}, self.buy_pressure: {self.buy_pressure}, self.sell_pressure: {self.sell_pressure}")
         signal_ = SignalType.NEUTRAL
         if self.buy_pressure > threshold and self.buy_pressure > self.sell_pressure:
             signal_ = SignalType.BUY

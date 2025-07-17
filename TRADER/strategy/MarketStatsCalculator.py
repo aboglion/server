@@ -78,3 +78,14 @@ class MarketStatsCalculator:
             if ask_qty > 0: buy.append(bid_qty / ask_qty)
             if bid_qty > 0: sell.append(ask_qty / bid_qty)
         return (sum(buy) / len(buy) if buy else 0.0, sum(sell) / len(sell) if sell else 0.0)
+
+
+    def calculate_Volume(self):
+        volumes = []
+        for ob in self.coin.orderbooks.values():
+            if not ob["bids"] or not ob["asks"]: continue
+            bid_volume = sum(q for _, q in ob["bids"])
+            ask_volume = sum(q for _, q in ob["asks"])
+            volumes.append((bid_volume + ask_volume) / 2)
+        return statistics.median(volumes) if volumes else 0.0
+        
