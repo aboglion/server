@@ -135,12 +135,27 @@ class Coin:
             self.last_time_str = datetime.now(ZoneInfo("Asia/Jerusalem")).strftime("%H:%M:%S")
             # No return statement here anymore
 
-
+    def init_table_status_data(self):
+        db_path = os.path.join("LOGS",f"{self.symbol}_status_data.db")
+        conn = sqlite3.connect(db_path)
+        c = conn.cursor()
+        # Ensure table exists before INSERT or UPDATE
+        c.execute("""
+                CREATE TABLE IF NOT EXISTS status_data_main_table (
+                    symbol TEXT, PRIMARY KEY AUTOINCREMENT,
+                    buyed_price REAL DEFAULT 0.0,
+                    is_in_bought_Position INTEGER DEFAULT 0,
+                    total_profit REAL DEFAULT 0.0,
+                    last_time_str TEXT DEFAULT "",
+                )
+            """)
+        conn.commit()
+        conn.close()
+        time.sleep(0.1)  # Ensure table creation is committed
 
     def restore_status_data(self):
+        self.init_table_status_data()
         db_path = os.path.join("LOGS",f"{self.symbol}_status_data.db")
-        if not os.path.exists(db_path):
-            return False
         conn = sqlite3.connect(db_path)
         c = conn.cursor()
         # Ensure table exists before SELECT
@@ -164,16 +179,8 @@ class Coin:
         conn = sqlite3.connect(db_path)
         c = conn.cursor()
         # Ensure table exists before INSERT or UPDATE
-        c.execute("""
-                CREATE TABLE IF NOT EXISTS status_data_main_table (
-                    symbol TEXT, PRIMARY KEY AUTOINCREMENT,
-                    buyed_price REAL DEFAULT 0.0,
-                    is_in_bought_Position INTEGER DEFAULT 0,
-                    total_profit REAL DEFAULT 0.0,
-                    last_time_str TEXT DEFAULT "",
-                )
-            """)
-        time.sleep(0.1)
+        self.init_table_status_data()
+        
         c.execute("""
             UPDATE status_data_main_table
             SET buyed_price = ?, is_in_bought_Position = ?, total_profit = ?, last_time_str = ?
