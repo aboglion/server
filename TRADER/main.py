@@ -93,7 +93,7 @@ def live_data():
                 "total_profit": coin.total_profit,
                 "trades": coin.trade_manager.trade_log if coin.trade_manager else [],
             }
-           
+    print( "LIVE DATA DEBUG:", {"data": result, "cycle_interval": Config.CYCLE_INTERVAL})
     return jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL})
 
 @app.route("/api/transactions/<symbol>", methods=["GET"])
