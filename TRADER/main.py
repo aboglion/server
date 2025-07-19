@@ -60,10 +60,7 @@ def live_data():
             else:
                 # Load live data from SQLite
                 result = SQL_DB_DashboardData.load_all_data()
-                print("Loading live data from SQLite")
-                for r in result:
-                    print(f"Loaded coin: {r['symbol']}")
-                    print("------------------------------------")
+
 
     except Exception as e:
         print(f"Error loading live data: {e}\n{traceback.format_exc()}")
@@ -88,6 +85,7 @@ def live_data():
                 "trades": coin.trade_manager.trade_log if coin.trade_manager else [],
             }
            
+    print("LIVE DATA DEBUG:", {"data": result, "cycle_interval": Config.CYCLE_INTERVAL})
     return jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL})
 
 @app.route("/api/transactions/<symbol>", methods=["GET"])
