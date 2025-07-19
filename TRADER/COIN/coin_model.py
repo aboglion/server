@@ -103,6 +103,7 @@ class Coin:
                 self.med_price = med_price
                 print(f"[DEBUG] {self.symbol}: type(med_price_history)={type(self.med_price_history)}")
                 self.med_price_history.append((now,self.med_price))
+                print(f"[DEBUG] {self.symbol}: med_price_history after append = {list(self.med_price_history)}")
             else:
                 print(f"Coin.process_coin: Invalid med_price for {self.symbol}: {med_price}")
                 return
