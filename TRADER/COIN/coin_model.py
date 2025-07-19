@@ -6,7 +6,7 @@ from strategy.SignalDecisionEngine import SignalDecisionEngine
 from strategy.TradeManager import TradeManager
 import traceback
 from dashboard_data.SQL_DB_DashboardData import SQL_DB_DashboardData
-
+from strategy.MarketStatsCalculator import MarketStatsCalculator # Moved import to top
 
 # Import SQL_DB_DashboardData only inside methods to avoid circular import
 
@@ -88,31 +88,26 @@ class Coin:
                 print(f"no data fetched for any exchange market for {self.symbol}")
                 return
             
-            self.signal_state.analyze(now)
+            signal=self.signal_state.analyze(now)
+            self.signal = signal.name if signal else "UNKNOWN"
 
-            binance_price = self.signal_state.binance_price
-            bybit_price = self.signal_state.bybit_price
-            okx_price = self.signal_state.okx_price
-            med_price = self.signal_state.med_price
-            signal = self.signal_state.last_decision
+            calc = MarketStatsCalculator(self.coin)
+            self.med_price = calc.calculate_med_price()
+            self.binance_price = calc.binance_price()
+            self.bybit_price = calc.bybit_price()
+            self.okx_price = calc.okx_price()
+
 
             # Assign calculated values to class members
             # Store current prices as previous prices before updating
             self.prev_med_price = self.med_price
-            if binance_price is not None and binance_price > 0:
+            if self.binance_price is not None and self.binance_price > 0:
                 self.prev_binance_price = self.binance_price
-            if bybit_price is not None and bybit_price > 0:
+            if self.bybit_price is not None and self.bybit_price > 0:
                 self.prev_bybit_price = self.bybit_price
-            if okx_price is not None and okx_price > 0:
+            if self.okx_price is not None and self.okx_price > 0:
                 self.prev_okx_price = self.okx_price
 
-
-            # Assign calculated values to class members (current prices)
-            self.med_price = med_price
-            self.binance_price = binance_price
-            self.bybit_price = bybit_price
-            self.okx_price = okx_price
-            self.signal = signal.name if signal else "UNKNOWN"
 
             if self.med_price is not None  and  self.prev_med_price != self.med_price and self.med_price>0:
                 self.trade_manager.check_selling_cond()
