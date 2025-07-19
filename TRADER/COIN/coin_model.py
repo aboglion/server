@@ -20,7 +20,8 @@ class Coin:
         # Use Config from CONFIG.py
         # Initialize SignalDecisionEngine and TradeManager with correct imports
         self.orderbooks = {ex: {"bids": [], "asks": []} for ex in ["binance", "bybit", "okx"]}
-        self.signal_state = SignalDecisionEngine(self)
+        self.calc = MarketStatsCalculator(self)
+        self.signal_state = SignalDecisionEngine(self,self.calc)
         self.trade_manager = TradeManager(self)
         self.is_in_bought_Position = False
         self.buyed_price = 0.0
@@ -91,11 +92,10 @@ class Coin:
             signal=self.signal_state.analyze(now)
             self.signal = signal.name if signal else "UNKNOWN"
 
-            calc = MarketStatsCalculator(self.coin)
-            self.med_price = calc.calculate_med_price()
-            self.binance_price = calc.binance_price()
-            self.bybit_price = calc.bybit_price()
-            self.okx_price = calc.okx_price()
+            self.med_price = self.calc.calculate_med_price()
+            self.binance_price = self.calc.binance_price()
+            self.bybit_price = self.calc.bybit_price()
+            self.okx_price = self.calc.okx_price()
 
 
             # Assign calculated values to class members

@@ -14,9 +14,9 @@ class SignalDecisionEngine:
     This revised engine uses a scoring system and robust risk management
     to make more reliable, conservative trading decisions.
     """
-    def __init__(self, coin):
+    def __init__(self, coin,calc):
         self.coin = coin
-        self.calc = MarketStatsCalculator(self.coin)
+        self.calc = calc
 
         # --- Data Deques for Indicators ---
         self.recent_signals = deque(maxlen=Config.MOMENTUM_WINDOW)
