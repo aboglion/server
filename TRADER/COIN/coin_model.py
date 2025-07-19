@@ -94,6 +94,7 @@ class Coin:
             self.signal = signal.name if signal else "UNKNOWN"
 
             med_price = self.calc.calculate_med_price()
+            print(f"[DEBUG] {self.symbol}: med_price from calculate_med_price = {med_price}")
             binance_price = self.calc.binance_price()
             bybit_price = self.calc.bybit_price()
             okx_price = self.calc.okx_price()
