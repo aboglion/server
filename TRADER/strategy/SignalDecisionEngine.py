@@ -51,8 +51,7 @@ class SignalDecisionEngine:
         self.recent_volumes.append(volume)
 
         if self.coin.is_in_bought_Position and self.coin.buyed_price > 0:
-            binance_price = self.calc.binance_price() 
-            self.coin.current_profit = (binance_price - self.coin.buyed_price) / self.coin.buyed_price
+            self.coin.current_profit = (self.coin.binance_price - self.coin.buyed_price) / self.coin.buyed_price
         else:
             self.coin.current_profit = 0.0
             
