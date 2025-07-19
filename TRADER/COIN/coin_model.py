@@ -71,7 +71,7 @@ class Coin:
                 
 
     def process_coin(self):
-        
+        print(f"[DEBUG] process_coin called for {self.symbol}")
         try:
             now = time.time()
             books = {}
