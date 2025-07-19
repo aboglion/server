@@ -117,17 +117,14 @@ class SignalDecisionEngine:
             net_potential_profit = potential_profit - (self.med_price * Config.FEE * 2)
 
             if potential_loss == 0:
-                self.coin.signal =  SignalType.NEUTRAL
-                return False
+                return SignalType.NEUTRAL 
 
             risk_reward_ratio = net_potential_profit / potential_loss
             
             if risk_reward_ratio < Config.MIN_RISK_REWARD_RATIO:
-                self.coin.signal =  SignalType.NEUTRAL
-                return False
+                return SignalType.NEUTRAL
         
-        self.coin.signal = signal
-        return True
+        return signal
 
     def analyze(self, now=None):
         """
@@ -137,20 +134,17 @@ class SignalDecisionEngine:
         now = now or time.time()
 
         if not self._update_market_data(now):
-            self.coin.signal = SignalType.NEUTRAL
-            return False
+            return SignalType.NEUTRAL
 
         # --- Check for sufficient data ---
         if (len(self.coin.med_price_history) < Config.VOLATILITY_WINDOW or
             len(self.recent_buy_pressure) < Config.PRESSURE_WINDOW or
             len(self.recent_volumes) < Config.VOLUME_WINDOW):
-            self.coin.signal = SignalType.NEUTRAL
-            return False
+            return SignalType.NEUTRAL
 
         # --- Calculate indicators and make a decision ---
         if not self._calculate_indicators():
-            self.coin.signal = SignalType.NEUTRAL
-            return False
+            return SignalType.NEUTRAL
 
         final_signal = self._make_decision()
         
@@ -170,5 +164,4 @@ class SignalDecisionEngine:
         self.recent_signals.append(raw_signal)
 
         self.last_decision = final_signal
-        self.coin.signal = final_signal
-        return True
+        return self.last_decision
