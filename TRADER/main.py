@@ -67,6 +67,7 @@ def live_data():
         print(f"Error loading live data: {e}\n{traceback.format_exc()}")
         return jsonify({"error": "Failed to load live data"}), 500
     if result or any(coin.symbol not in result for coin in ALL_Coins.Coins):
+            pragsess="0.00%"
             for coin in ALL_Coins.Coins:
                 pragsess = f"{(len(result[coin.symbol].get('price_history', []))/Config.HISTORY_LIMIT)*100:.2f}%"
                 result[coin.symbol] = {
