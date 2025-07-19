@@ -65,7 +65,6 @@ def live_data():
         print(f"Error loading live data: {e}\n{traceback.format_exc()}")
         return jsonify({"error": "Failed to load live data"}), 500
     if not result or any(coin.symbol not in result for coin in ALL_Coins.Coins):
-            pragsess="0.00%"
             for coin in ALL_Coins.Coins:
                 result[coin.symbol] = {
                     "symbol": coin.symbol,
@@ -80,7 +79,7 @@ def live_data():
                     "total_sell_trades": coin.total_sell_trades,
                     "total_profit": coin.total_profit,
                     "trades": coin.trade_manager.trade_log if coin.trade_manager else []}
-            print("collect data: ", pragsess)
+                print(f"collect data: {coin.symbol} - error loading data")
     else:
         for coin in ALL_Coins.Coins:
             pragsess = f"{(len(coin.med_price_history)/Config.HISTORY_LIMIT)*100:.2f}%"
