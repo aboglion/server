@@ -87,7 +87,7 @@ format:
 
 push:
 	git add .
-	git commit -m "Update Makefile and docker-compose.yml"
+	git commit -m "Update Makefile and docker-compose.yml" || true
 	git push origin main
 	@echo "Changes pushed to the repository."
 
