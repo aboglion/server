@@ -97,22 +97,34 @@ class Coin:
             binance_price = self.calc.binance_price()
             bybit_price = self.calc.bybit_price()
             okx_price = self.calc.okx_price()
-            if not(med_price is None and med_price <= 0):
+            if med_price is not None and med_price > 0:
                 self.prev_med_price =self.med_price
                 self.med_price = med_price
                 self.med_price_history.append((now,self.med_price))
-            if not(binance_price is None and binance_price <= 0):
+            else:
+                print(f"Coin.process_coin: Invalid med_price for {self.symbol}: {med_price}")
+                return
+            if binance_price is not None and med_price > 0:
                 self.prev_binance_price =self.binance_price
                 self.binance_price = binance_price
                 self.binance_history.append((now, self.binance_price))
-            if not(bybit_price is None and bybit_price <= 0):
+            else:
+                print(f"Coin.process_coin: Invalid binance_price for {self.symbol}: {binance_price}")
+                return
+            if bybit_price is not None and med_price > 0:
                 self.prev_bybit_price =self.bybit_price
                 self.bybit_price = bybit_price
                 self.bybit_history.append((now, self.bybit_price))
-            if not(okx_price is None and okx_price <= 0):
+            else:
+                print(f"Coin.process_coin: Invalid bybit_price for {self.symbol}: {bybit_price}")
+                return
+            if okx_price is not None and med_price > 0:
                 self.prev_okx_price =self.okx_price
                 self.okx_price = okx_price
                 self.okx_history.append((now, self.okx_price))
+            else:
+                print(f"Coin.process_coin: Invalid okx_price for {self.symbol}: {okx_price}")
+                return
 
                 
             if self.med_price is not None  and  self.prev_med_price != self.med_price and self.med_price>0:
