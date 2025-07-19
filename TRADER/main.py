@@ -66,59 +66,29 @@ def live_data():
     except Exception as e:
         print(f"Error loading live data: {e}\n{traceback.format_exc()}")
         return jsonify({"error": "Failed to load live data"}), 500
+    if result or any(coin.symbol not in result for coin in ALL_Coins.Coins):
+            for coin in ALL_Coins.Coins:
+                pragsess = f"{(len(result[coin.symbol].get('price_history', []))/Config.HISTORY_LIMIT)*100:.2f}%"
+                result[coin.symbol] = {
+                    "symbol": coin.symbol,
+                    "binance_price": 0.0,
+                    "momentum": 0.0,
+                    "buy_pressure": 0.0,
+                    "sell_pressure": 0.0,
+                    "signal":  pragsess,
+                    "position": coin.is_in_bought_Position,
+                    "pnl_pct": coin.current_profit if coin.is_in_bought_Position else 0.0,
+                    "total_buy_trades": coin.total_buy_trades,
+                    "total_sell_trades": coin.total_sell_trades,
+                    "total_profit": coin.total_profit,
+                    "trades": coin.trade_manager.trade_log if coin.trade_manager else []}
+    print("collect data: ", pragsess)
+    return (jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL}), 200)
     
-    # Safely check result structure to avoid KeyError
-    # Accept both dict and list result formats
-    if not result:
-        print("No data found, initializing with empty structure.")
-        print("DEBUG: Reason for empty result:",
-              f"result={result}, type={type(result)}",
-              file=sys.stderr)
-        result = {}
-        for coin in ALL_Coins.Coins:
-            result[coin.symbol] = {
-                "symbol": coin.symbol,
-                "binance_price": 0.0,
-                "momentum": 0.0,
-                "buy_pressure": 0.0,
-                "sell_pressure": 0.0,
-                "signal":  f"{(len(result[coin.symbol].get('price_history', []))/Config.HISTORY_LIMIT)*100:.2f}%" ,
-                "position": coin.is_in_bought_Position,
-                "pnl_pct": coin.current_profit if coin.is_in_bought_Position else 0.0,
-                "total_buy_trades": coin.total_buy_trades,
-                "total_sell_trades": coin.total_sell_trades,
-                "total_profit": coin.total_profit,
-                "trades": coin.trade_manager.trade_log if coin.trade_manager else []}
-    elif isinstance(result, dict):
-        # Use the dict as-is if it matches expected structure
-        pass
-    elif isinstance(result, list):
-        # Convert list format to dict keyed by symbol if needed
-        if result and isinstance(result[0], dict):
-            result = {k: v for k, v in result[0].items()}
-    else:
-        print("Unknown result format, initializing empty structure.", file=sys.stderr)
-        result = {}
-        for coin in ALL_Coins.Coins:
-            result[coin.symbol] = {
-                "symbol": coin.symbol,
-                "binance_price": 0.0,
-                "momentum": 0.0,
-                "buy_pressure": 0.0,
-                "sell_pressure": 0.0,
-                "signal":  f"{(len(result[coin.symbol].get('price_history', []))/Config.HISTORY_LIMIT)*100:.2f}%" ,
-                "position": coin.is_in_bought_Position,
-                "pnl_pct": coin.current_profit if coin.is_in_bought_Position else 0.0,
-                "total_buy_trades": coin.total_buy_trades,
-                "total_sell_trades": coin.total_sell_trades,
-                "total_profit": coin.total_profit,
-                "trades": coin.trade_manager.trade_log if coin.trade_manager else []}
-
 @app.route("/trader/api/live", methods=["GET"])
 def trader_live_data():
     return live_data()
-    print( "LIVE DATA DEBUG:", {"data": result, "cycle_interval": Config.CYCLE_INTERVAL})
-    return jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL})
+
 
 @app.route("/api/transactions/<symbol>", methods=["GET"])
 def get_transactions(symbol):
