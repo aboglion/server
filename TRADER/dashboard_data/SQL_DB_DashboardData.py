@@ -107,7 +107,6 @@ class SQL_DB_DashboardData:
                 coin_obj.total_buy_trades,
                 coin_obj.total_sell_trades,
                 coin_obj.total_profit,
-
                 coin_obj.is_in_bought_Position,
                 coin_obj.buyed_price,
                 getattr(coin_obj, 'last_buy_time', "")
