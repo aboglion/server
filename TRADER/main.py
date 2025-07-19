@@ -64,7 +64,7 @@ def live_data():
     except Exception as e:
         print(f"Error loading live data: {e}\n{traceback.format_exc()}")
         return jsonify({"error": "Failed to load live data"}), 500
-    if result or any(coin.symbol not in result for coin in ALL_Coins.Coins):
+    if not result or any(coin.symbol not in result for coin in ALL_Coins.Coins):
             pragsess="0.00%"
             for coin in ALL_Coins.Coins:
                 pragsess = f"{(len(coin.med_price_history)/Config.HISTORY_LIMIT)*100:.2f}%"
@@ -82,6 +82,7 @@ def live_data():
                     "total_profit": coin.total_profit,
                     "trades": coin.trade_manager.trade_log if coin.trade_manager else []}
             print("collect data: ", pragsess)
+    
     return (jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL}), 200)
 
 @app.route("/trader/api/live", methods=["GET"])
