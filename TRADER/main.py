@@ -51,7 +51,7 @@ def dashboard():
 def ping():
     return {"status": "alive"}
 
-@app.route("/trader/api/live", methods=["GET"])
+@app.route("/api/live", methods=["GET"])
 def live_data():
     try:
         with coins_lock:
