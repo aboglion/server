@@ -278,7 +278,7 @@ async function createEnlargedChart(canvas, symbol, metric, resultsCache, clearBu
 // -- שליפת נתונים עיקריים --
 async function fetchData() {
   try {
-    const res = await fetch('/trader/api/live');
+    const res = await fetch('/api/live');
     if (!res.ok) {
       console.error("HTTP error!", res.status);
       return null;
@@ -300,7 +300,7 @@ async function fetchTradePoints(symbol, cache = null) {
     };
   }
   try {
-    const res = await fetch('/trader/api/live');
+    const res = await fetch('/api/live');
     if (!res.ok) return { buyPoints: [], sellPoints: [] };
     const results = await res.json();
     if (results.data && results.data[symbol]) {
