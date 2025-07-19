@@ -5,6 +5,7 @@ from CONFIG import Config
 from strategy.SignalDecisionEngine import SignalDecisionEngine
 from strategy.TradeManager import TradeManager
 import traceback
+from collections import deque
 from dashboard_data.SQL_DB_DashboardData import SQL_DB_DashboardData
 from strategy.MarketStatsCalculator import MarketStatsCalculator # Moved import to top
 
@@ -25,10 +26,10 @@ class Coin:
         self.trade_manager = TradeManager(self)
         self.is_in_bought_Position = False
         self.buyed_price = 0.0
-        self.med_price_history = [] # Initialize med_price_history
-        self.binance_history = [] # Initialize binance_history
-        self.bybit_history = []   # Initialize bybit_history
-        self.okx_history = []     # Initialize okx_history
+        self.med_price_history = deque(maxlen=Config.HISTORY_LIMIT)  # Initialize med_price_history
+        self.binance_history = deque(maxlen=Config.HISTORY_LIMIT)  # Initialize binance_history
+        self.bybit_history =deque(maxlen=Config.HISTORY_LIMIT)   # Initialize bybit_history
+        self.okx_history = deque(maxlen=Config.HISTORY_LIMIT)   # Initialize okx_history     # Initialize okx_history
         self.current_profit = 0.0
         self.last_buy_time = ""  # Initialize last_buy_time
 
@@ -92,24 +93,28 @@ class Coin:
             signal=self.signal_state.analyze(now)
             self.signal = signal.name if signal else "UNKNOWN"
 
-            self.med_price = self.calc.calculate_med_price()
-            self.binance_price = self.calc.binance_price()
-            self.bybit_price = self.calc.bybit_price()
-            self.okx_price = self.calc.okx_price()
+            med_price = self.calc.calculate_med_price()
+            binance_price = self.calc.binance_price()
+            bybit_price = self.calc.bybit_price()
+            okx_price = self.calc.okx_price()
+            if not(med_price is None and med_price <= 0):
+                self.prev_med_price =self.med_price
+                self.med_price = med_price
+                self.med_price_history.append(self.med_price)
+            if not(binance_price is None and binance_price <= 0):
+                self.prev_binance_price =self.binance_price
+                self.binance_price = binance_price
+                self.binance_history.append(self.binance_price)
+            if not(bybit_price is None and bybit_price <= 0):
+                self.prev_bybit_price =self.bybit_price
+                self.bybit_price = bybit_price
+                self.bybit_history.append(self.bybit_price)
+            if not(okx_price is None and okx_price <= 0):
+                self.prev_okx_price =self.okx_price
+                self.okx_price = okx_price
+                self.okx_history.append(self.okx_price)
 
-            print(f"Coin.process_coin: {self.symbol} - Prices: Binance={self.binance_price}, Bybit={self.bybit_price}, OKX={self.okx_price}, Med={self.med_price}, Signal={self.signal}, Time={self.last_time_str}")
-
-            # Assign calculated values to class members
-            # Store current prices as previous prices before updating
-            self.prev_med_price = self.med_price
-            if self.binance_price is not None and self.binance_price > 0:
-                self.prev_binance_price = self.binance_price
-            if self.bybit_price is not None and self.bybit_price > 0:
-                self.prev_bybit_price = self.bybit_price
-            if self.okx_price is not None and self.okx_price > 0:
-                self.prev_okx_price = self.okx_price
-
-
+                
             if self.med_price is not None  and  self.prev_med_price != self.med_price and self.med_price>0:
                 self.trade_manager.check_selling_cond()
                 self.trade_manager.check_buying_cond()

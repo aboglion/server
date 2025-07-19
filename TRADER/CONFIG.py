@@ -21,9 +21,11 @@ class Config:
     
     # -- Technical Indicator Windows --
     # Shorter window for recent, fast-changing momentum
-    MOMENTUM_WINDOW = 15 
+    MOMENTUM_WINDOW =min(15,HISTORY_LIMIT)  
     # Medium window for pressure calculation, to get a stable trend
-    PRESSURE_WINDOW = 30
+    PRESSURE_WINDOW = min(30, HISTORY_LIMIT)  # 30 seconds
+    # Longer window for long-term momentum, to capture broader trends
+    MOMENTUM_WINDOW_LONG = 30
     # Longer window for volume trend, to identify significant market activity shifts
     VOLUME_WINDOW = 60
     # Window for volatility calculation, based on historical price changes
