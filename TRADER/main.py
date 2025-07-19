@@ -63,6 +63,9 @@ def live_data():
                 print("Loading live data from SQLite")
                 for r in result:
                     print(f"Loaded data: {r}")
+                    for i in r:
+                        print(f"Loaded data: {r[i]}")
+                      
                     print("------------------------------------")
 
     except Exception as e:
