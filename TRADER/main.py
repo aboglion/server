@@ -118,7 +118,8 @@ def n8n_hook():
     return {"status": "configuration updated", "symbols": Config.SYMBOLS}
 
 
-if __name__ == "__main__":
+@app.before_first_request
+def initialize_trading():
     print("Initializing coins...")
     try:
         for symbol in Config.SYMBOLS:
