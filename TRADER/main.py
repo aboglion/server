@@ -66,7 +66,7 @@ def live_data():
         print(f"Error loading live data: {e}\n{traceback.format_exc()}")
         return jsonify({"error": "Failed to load live data"}), 500
     
-    if not result:
+    if not result or( result[symbol].get("buy_pressure") == 0.0 and result[symbol].get("sell_pressure") == 0.0):
         print("No data found, initializing with empty structure.")
         result = {}
         for coin in ALL_Coins.Coins:
@@ -76,7 +76,7 @@ def live_data():
                 "momentum": 0.0,
                 "buy_pressure": 0.0,
                 "sell_pressure": 0.0,
-                "signal":  f"{(len(result[symbol].get('price_history', []))/Config.HISTORY_LIMIT)*100:.2f}%" if result[symbol].get("momentum")== 0.0 and result[symbol].get("buy_pressure") == 0.0 and result[symbol].get("sell_pressure") == 0.0 else "No Signal",
+                "signal":  f"{(len(result[symbol].get('price_history', []))/Config.HISTORY_LIMIT)*100:.2f}%" ,
                 "position": coin.is_in_bought_Position,
                 "pnl_pct": coin.current_profit if coin.is_in_bought_Position else 0.0,
                 "total_buy_trades": coin.total_buy_trades,
