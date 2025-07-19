@@ -64,7 +64,7 @@ def live_data():
                 for r in result:
                     print(f"Loaded data: {r}")
                     for i in r:
-                        print(f"Loaded data: {r[i]}")
+                        print(f"Loaded data: {i}")
                       
                     print("------------------------------------")
 
