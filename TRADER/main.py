@@ -118,22 +118,21 @@ def n8n_hook():
     return {"status": "configuration updated", "symbols": Config.SYMBOLS}
 
 
-@app.before_first_request
-def initialize_trading():
-    print("Initializing coins...")
-    try:
-        for symbol in Config.SYMBOLS:
-            Coin(symbol)
-        for coin in ALL_Coins.Coins:
-            print(f"Successfully initialized coin: {coin.symbol}")
-            coin.restore_status_data()
-    except Exception as e:
-        print(f"Error initializing coins: {e}\n{traceback.format_exc()}")
+# --- Initialization for all environments (development & production) ---
+print("Initializing coins...")
+try:
+    for symbol in Config.SYMBOLS:
+        Coin(symbol)
+    for coin in ALL_Coins.Coins:
+        print(f"Successfully initialized coin: {coin.symbol}")
+        coin.restore_status_data()
+except Exception as e:
+    print(f"Error initializing coins: {e}\n{traceback.format_exc()}")
 
-    print("Starting trading loop thread...")
-    trading_thread = threading.Thread(target=trading_loop, daemon=True)
-    trading_thread.start()
-    print("Trading loop thread started successfully.")
+print("Starting trading loop thread...")
+trading_thread = threading.Thread(target=trading_loop, daemon=True)
+trading_thread.start()
+print("Trading loop thread started successfully.")
 
-    # Note: If you use a production WSGI server like Gunicorn,
-    # you will point it to this 'app' object (e.g., gunicorn --bind 0.0.0.0:7070 'app:app')
+# Note: If you use a production WSGI server like Gunicorn,
+# you will point it to this 'app' object (e.g., gunicorn --bind 0.0.0.0:7070 'app:app')
