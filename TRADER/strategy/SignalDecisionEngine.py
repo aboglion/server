@@ -1,8 +1,8 @@
 # SignalDecisionEngine.py
+from CONFIG import Config, SignalType
 import time
 import statistics
 from collections import deque
-from CONFIG import Config, SignalType
 from strategy.MarketStatsCalculator import MarketStatsCalculator
 
 # =====================================================

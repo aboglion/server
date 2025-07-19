@@ -1,12 +1,12 @@
+from CONFIG import Config
+from collections import deque
 import time,os,sqlite3
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from CONFIG import Config
 from strategy.SignalDecisionEngine import SignalDecisionEngine
 from strategy.TradeManager import TradeManager
-import traceback
-from collections import deque
 from dashboard_data.SQL_DB_DashboardData import SQL_DB_DashboardData
+import traceback
 from strategy.MarketStatsCalculator import MarketStatsCalculator # Moved import to top
 
 # Import SQL_DB_DashboardData only inside methods to avoid circular import
@@ -101,6 +101,7 @@ class Coin:
             if med_price is not None and med_price > 0:
                 self.prev_med_price =self.med_price
                 self.med_price = med_price
+                print(f"[DEBUG] {self.symbol}: type(med_price_history)={type(self.med_price_history)}")
                 self.med_price_history.append((now,self.med_price))
             else:
                 print(f"Coin.process_coin: Invalid med_price for {self.symbol}: {med_price}")
