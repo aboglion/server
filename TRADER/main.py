@@ -61,7 +61,11 @@ def live_data():
                 # Load live data from SQLite
                 result = SQL_DB_DashboardData.load_all_data(Config.SYMBOLS, Config.HISTORY_LIMIT)
                 print("Loading live data from SQLite")
-                print(jsonify(result)) 
+                for r in result:
+                    print(f"Loaded coin: {r['symbol']}")
+                    print(f"Loaded data: {r}")
+                    print("------------------------------------")
+
     except Exception as e:
         print(f"Error loading live data: {e}\n{traceback.format_exc()}")
         return jsonify({"error": "Failed to load live data"}), 500
