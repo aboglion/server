@@ -51,7 +51,7 @@ def dashboard():
 def ping():
     return {"status": "alive"}
 
-@app.route("/api/live", methods=["GET"])
+@app.route("/trader/api/live", methods=["GET"])
 def live_data():
     try:
         with coins_lock:
@@ -84,9 +84,6 @@ def live_data():
             print("collect data: ", pragsess)
     return (jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL}), 200)
     
-@app.route("/trader/api/live", methods=["GET"])
-def trader_live_data():
-    return live_data()
 
 
 @app.route("/api/transactions/<symbol>", methods=["GET"])
