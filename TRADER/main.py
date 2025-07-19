@@ -59,13 +59,10 @@ def live_data():
                 result =None
             else:
                 # Load live data from SQLite
-                result = SQL_DB_DashboardData.load_all_data(Config.SYMBOLS, Config.HISTORY_LIMIT)
+                result = SQL_DB_DashboardData.load_all_data()
                 print("Loading live data from SQLite")
                 for r in result:
-                    print(f"Loaded data: {r}")
-                    for i in r:
-                        print(f"Loaded data: {i}")
-                      
+                    print(f"Loaded coin: {r['symbol']}")
                     print("------------------------------------")
 
     except Exception as e:

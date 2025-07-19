@@ -141,7 +141,7 @@ class SQL_DB_DashboardData:
  
 
     @staticmethod
-    def load_all_data(symbols, history_limit=200):
+    def load_all_data(symbols=Config.SYMBOLS, history_limit=Config.HISTORY_LIMIT):
         initialize_dashboard_db()
         conn = sqlite3.connect(Config.DB_NAME)
         c = conn.cursor()
