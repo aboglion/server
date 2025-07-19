@@ -22,7 +22,7 @@ class Config:
     recent_Volumes_len=recent_pressure_len*2
     MIN_CONSEC_SIGNALS_postive = 3  # Minimum consecutive signals to consider a trade
     MIN_CONSEC_SIGNALS_negative = 5  # Minimum consecutive signals to consider a trade
-
+    MIN_EXPECTED_PROFIT=0.5 # דרישת רווח פוטנציאלי מינימלית (יחס בין לחץ קנייה למכירה)
     FEE = (0.15)/100  # Trading fee (0.15% for Binance, Bybit, OKX)
     TAKE_profit_PCT = (0.6)/100 # 0.6% take profit (profit after fee)
     STOP_LOSS_PCT = (1.7)/100 # 1.7% stop loss
