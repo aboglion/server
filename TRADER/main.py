@@ -60,6 +60,7 @@ def live_data():
             else:
                 # Load live data from SQLite
                 result = SQL_DB_DashboardData.load_all_data()
+                print("DEBUG: Loaded result from DB:", result, file=sys.stderr)
 
 
     except Exception as e:
@@ -67,32 +68,32 @@ def live_data():
         return jsonify({"error": "Failed to load live data"}), 500
     
     # Safely check result structure to avoid KeyError
-    if (
-        not result or
+    if (not result or
         not isinstance(result, list) or
         not result or
         not result[0] or
         Config.SYMBOLS[0] not in result[0] or
         result[0][Config.SYMBOLS[0]].get("buy_pressure", 0.0) == 0.0 and
-        result[0][Config.SYMBOLS[0]].get("sell_pressure", 0.0) == 0.0
-    ):
-        print("No data found, initializing with empty structure.")
-        result = {}
-        for coin in ALL_Coins.Coins:
-            result[coin.symbol] = {
-                "symbol": coin.symbol,
-                "binance_price": 0.0,
-                "momentum": 0.0,
-                "buy_pressure": 0.0,
-                "sell_pressure": 0.0,
-                "signal":  f"{(len(result[coin.symbol].get('price_history', []))/Config.HISTORY_LIMIT)*100:.2f}%" ,
-                "position": coin.is_in_bought_Position,
-                "pnl_pct": coin.current_profit if coin.is_in_bought_Position else 0.0,
-                "total_buy_trades": coin.total_buy_trades,
-                "total_sell_trades": coin.total_sell_trades,
-                "total_profit": coin.total_profit,
-                "trades": coin.trade_manager.trade_log if coin.trade_manager else [],
-            }
+        result[0][Config.SYMBOLS[0]].get("sell_pressure", 0.0) == 0.0):
+                print("No data found, initializing with empty structure.")
+                print("DEBUG: Reason for empty result:",
+                      f"result={result}, type={type(result)}, first={result[0] if isinstance(result, list) and result else 'N/A'}",
+                      file=sys.stderr)
+                result = {}
+                for coin in ALL_Coins.Coins:
+                    result[coin.symbol] = {
+                        "symbol": coin.symbol,
+                        "binance_price": 0.0,
+                        "momentum": 0.0,
+                        "buy_pressure": 0.0,
+                        "sell_pressure": 0.0,
+                        "signal":  f"{(len(result[coin.symbol].get('price_history', []))/Config.HISTORY_LIMIT)*100:.2f}%" ,
+                        "position": coin.is_in_bought_Position,
+                        "pnl_pct": coin.current_profit if coin.is_in_bought_Position else 0.0,
+                        "total_buy_trades": coin.total_buy_trades,
+                        "total_sell_trades": coin.total_sell_trades,
+                        "total_profit": coin.total_profit,
+                        "trades": coin.trade_manager.trade_log if coin.trade_manager else []}
     print( "LIVE DATA DEBUG:", {"data": result, "cycle_interval": Config.CYCLE_INTERVAL})
     return jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL})
 
