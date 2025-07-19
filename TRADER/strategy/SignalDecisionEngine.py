@@ -1,136 +1,168 @@
+# SignalDecisionEngine.py
+import time
+import statistics
 from collections import deque
-from strategy.MarketStatsCalculator import MarketStatsCalculator # Moved import to top
-import time, statistics
-from CONFIG import Config, SignalType  # Import SignalType from CONFIG.py
+from CONFIG import Config, SignalType
+from strategy.MarketStatsCalculator import MarketStatsCalculator
 
 # =====================================================
-# מחליט איתותים
+# מנוע החלטות איתותים משופר
 # =====================================================
 class SignalDecisionEngine:
+    """
+    Analyzes market data for a specific coin to generate trading signals.
+    This revised engine uses a scoring system and robust risk management
+    to make more reliable, conservative trading decisions.
+    """
     def __init__(self, coin):
         self.coin = coin
-        self.current_signal = SignalType.NEUTRAL
-        self.signal_price = 0.0
-        self.consecutive = 0
+        self.calc = MarketStatsCalculator(self.coin)
+
+        # --- Data Deques for Indicators ---
+        self.recent_signals = deque(maxlen=Config.MOMENTUM_WINDOW)
+        self.recent_buy_pressure = deque(maxlen=Config.PRESSURE_WINDOW)
+        self.recent_sell_pressure = deque(maxlen=Config.PRESSURE_WINDOW)
+        self.recent_volumes = deque(maxlen=Config.VOLUME_WINDOW)
+
+        # --- State Variables ---
         self.med_price = 0.0
+        self.last_decision = SignalType.NEUTRAL
+
+        # --- Instance attributes for indicators (as requested) ---
         self.volatility = 0.0
-        self.momentum = 0.0
-        self.buy_pressure = 0.0
-        self.sell_pressure = 0.0
-        self.binance_price = 0.0  # Main reference price
-        self.bybit_price = 0.0  # Secondary reference price
-        self.okx_price = 0.0  # OKX reference price
-        self.recent_signals = deque(maxlen=Config.recent_signals_len)  
-        self.recent_buy_pressure = deque(maxlen=Config.recent_pressure_len)
-        self.recent_sell_pressure = deque(maxlen=Config.recent_pressure_len)
-        self.recent_Volumes = deque(maxlen=Config.recent_Volumes_len)
-        self.last_decision = SignalType.NEUTRAL  # Last decision made by the engine
+        self.signal_momentum = 0.0
+        self.pressure_score = 0.0
+        self.volume_momentum = 0.0
 
-    def analyze(self, now=None):
-        from CONFIG import Config, SignalType # Import SignalType locally
-        now = now or time.time()
-        # Check for stale data from exchanges
-
-
-        calc = MarketStatsCalculator(self.coin)
-        self.med_price = calc.calculate_med_price()
-        self.binance_price = calc.binance_price()
-        self.bybit_price = calc.bybit_price()
-        self.okx_price = calc.okx_price()
-
-        # Append current prices to history deques regardless of med_price value
-        self.coin.med_price_history.append((now, self.med_price))
-        self.coin.binance_history.append((now, self.binance_price))
-        self.coin.bybit_history.append((now, self.bybit_price))
-        self.coin.okx_history.append((now, self.okx_price))
-
-        # Limit history length to Config.HISTORY_LIMIT
-        history_limit = Config.HISTORY_LIMIT if Config.HISTORY_LIMIT > 0 else 60
-        if len(self.coin.med_price_history) > history_limit:
-            self.coin.med_price_history.pop(0)
-        if len(self.coin.binance_history) > history_limit:
-            self.coin.binance_history.pop(0)
-        if len(self.coin.bybit_history) > history_limit:
-            self.coin.bybit_history.pop(0)
-        if len(self.coin.okx_history) > history_limit:
-            self.coin.okx_history.pop(0)    
-
-
-
-
-        # If med_price is still zero or negative after appending, return NEUTRAL
+    def _update_market_data(self, now):
+        """Fetches and updates the latest market prices and volumes."""
+        self.med_price = self.calc.calculate_med_price()
+        
         if self.med_price <= 0:
-            print(f"Average price is zero or negative ({self.med_price}). Not appending to history.")
-            self.last_decision = SignalType.NEUTRAL
-            return SignalType.NEUTRAL
+            return False
+
+        self.coin.med_price_history.append((now, self.med_price))
+        
+        buy_p, sell_p = self.calc.calculate_pressure_ratios()
+        volume = self.calc.calculate_Volume()
+        
+        self.recent_buy_pressure.append(buy_p)
+        self.recent_sell_pressure.append(sell_p)
+        self.recent_volumes.append(volume)
 
         if self.coin.is_in_bought_Position and self.coin.buyed_price > 0:
-            self.coin.current_profit = (self.coin.binance_price - self.coin.buyed_price) / self.coin.buyed_price - (Config.FEE * 2)
+            binance_price = self.calc.binance_price() 
+            self.coin.current_profit = (binance_price - self.coin.buyed_price) / self.coin.buyed_price
         else:
             self.coin.current_profit = 0.0
-
-        history_len = len(self.coin.med_price_history)
-        if history_len < Config.VOLATILITY_WINDOW:
-            self.last_decision = SignalType.NEUTRAL
-            return self.last_decision
-        self.volatility = calc.calculate_volatility()
-
-        self.buy_pressure, self.sell_pressure = calc.calculate_pressure_ratios()
-        last_Volume= calc.calculate_Volume()
-        self.recent_buy_pressure.append(self.buy_pressure)
-        self.recent_sell_pressure.append(self.sell_pressure)    
-        self.recent_Volumes.append(last_Volume)
-
-        if  len(self.recent_buy_pressure) < Config.recent_pressure_len or \
-            len(self.recent_sell_pressure) < Config.recent_pressure_len or \
-            len(self.recent_Volumes) < Config.recent_Volumes_len:
-                self.last_decision = SignalType.NEUTRAL
-                return self.last_decision
-        # Calculate the median of buy and sell pressures
-        recent_volumes_list = list(self.recent_Volumes)
-        Volume_median_PART1 = statistics.median(recent_volumes_list[:int(Config.recent_Volumes_len/2)+1])
-        Volume_median_PART2 = statistics.median(recent_volumes_list[int(Config.recent_Volumes_len/2):])
-        volume_factor = ((Volume_median_PART2 - Volume_median_PART1)/ Volume_median_PART2)*10 if Volume_median_PART2 > 0 else 0.0
-        self.buy_pressure = statistics.median(self.recent_buy_pressure)+volume_factor 
-        self.sell_pressure = statistics.median(self.recent_sell_pressure)+volume_factor 
-
-        vol_factor = min(self.volatility, 0.05)  # מגביל תנודתיות קיצונית
-        momentum_adj = max(0.0, 1 + self.momentum)  # לא יורד מתחת ל־1
-
-        threshold = Config.BASE_THRESHOLD + (vol_factor * 10 + volume_factor * 0.5) * momentum_adj
-        # print(f"thereshold: {threshold}, self.buy_pressure: {self.buy_pressure}, self.sell_pressure: {self.sell_pressure}")
-        signal_ = SignalType.NEUTRAL
-        if self.buy_pressure > threshold and self.buy_pressure > self.sell_pressure:
-            signal_ = SignalType.BUY
-        elif self.sell_pressure +(volume_factor * 10)> threshold and self.sell_pressure > self.buy_pressure:
-            signal_ = SignalType.SELL
-        expected_profit = (self.buy_pressure - self.sell_pressure) / (self.sell_pressure + 1e-6)
-        if expected_profit < Config.MIN_EXPECTED_PROFIT:
-            signal_ = SignalType.NEUTRAL
-
-
-        # Check for consecutive signals shuld be sell/nuetral or buy/nuetral not sell/buy/neutral
-        if (signal_ == SignalType.BUY and SignalType.SELL in self.recent_signals) or \
-            (signal_ == SignalType.SELL and SignalType.BUY in self.recent_signals):
-                self.recent_signals.clear()
-        self.recent_signals.append(signal_)
-
-
-
-        postive_signals = self.recent_signals.count(SignalType.BUY)
-        negative_signals = self.recent_signals.count(SignalType.SELL)
-        # print(f" {self.coin.symbol} - Postive: {postive_signals}, Negative: {negative_signals},\n Recent Signals: {list(self.recent_signals)}\n {(postive_signals - negative_signals) / len(self.recent_signals) if len(self.recent_signals) > 0 else 0.0}\n","="*20)
-        if len(self.recent_signals) > min(Config.MIN_CONSEC_SIGNALS_postive, Config.MIN_CONSEC_SIGNALS_negative):
-            self.momentum = (postive_signals - negative_signals) / len(self.recent_signals)
-        else:
-            self.momentum = 0.0
-        self.last_decision = SignalType.NEUTRAL
-        if len(self.recent_signals) == Config.recent_signals_len:
-            if postive_signals > Config.MIN_CONSEC_SIGNALS_postive:
-                self.last_decision = SignalType.BUY
-            elif self.recent_signals.count(SignalType.SELL) > Config.MIN_CONSEC_SIGNALS_negative:
-                self.last_decision = SignalType.SELL
             
-       
-        return self.last_decision
+        return True
 
+    def _calculate_indicators(self):
+        """
+        Calculates high-level indicators and stores them directly
+        as instance attributes. Returns False if there's not enough data.
+        """
+        volumes_list = list(self.recent_volumes)
+        if (len(volumes_list) // 2) < 2:
+            return False # Not enough data for volume momentum
+
+        # --- Signal Momentum ---
+        buy_signals = self.recent_signals.count(SignalType.BUY)
+        sell_signals = self.recent_signals.count(SignalType.SELL)
+        total_signals = len(self.recent_signals)
+        self.signal_momentum = (buy_signals - sell_signals) / total_signals if total_signals > 0 else 0.0
+
+        # --- Pressure Analysis ---
+        median_buy_pressure = statistics.median(self.recent_buy_pressure)
+        median_sell_pressure = statistics.median(self.recent_sell_pressure)
+        self.pressure_score = (median_buy_pressure - median_sell_pressure) / (median_buy_pressure + median_sell_pressure + 1e-9)
+
+        # --- Volume Momentum ---
+        split_point = len(volumes_list) // 2
+        median_vol_recent = statistics.median(volumes_list[split_point:])
+        median_vol_older = statistics.median(volumes_list[:split_point])
+        self.volume_momentum = (median_vol_recent - median_vol_older) / (median_vol_recent + median_vol_older + 1e-9)
+
+        # --- Volatility ---
+        self.volatility = self.calc.calculate_volatility()
+        
+        return True
+
+    def _make_decision(self):
+        """
+        Makes the final trade decision based on instance indicators and risk management.
+        No longer needs arguments as it uses 'self'.
+        """
+        # --- Weighted Trade Score ---
+        trade_score = (
+            (self.pressure_score * 0.5) +
+            (self.signal_momentum * 0.3) +
+            (self.volume_momentum * 0.2)
+        )
+
+        # --- Dynamic Threshold ---
+        volatility_adjustment = min(self.volatility * 5, 0.2)
+        decision_threshold = Config.BASE_DECISION_THRESHOLD + volatility_adjustment
+
+        signal = SignalType.NEUTRAL
+        if trade_score > decision_threshold:
+            signal = SignalType.BUY
+        elif trade_score < -decision_threshold:
+            signal = SignalType.SELL
+
+        # --- CRITICAL: Risk/Reward Filter ---
+        if signal != SignalType.NEUTRAL:
+            potential_profit = self.med_price * Config.TAKE_PROFIT_PCT
+            potential_loss = self.med_price * Config.STOP_LOSS_PCT
+            net_potential_profit = potential_profit - (self.med_price * Config.FEE * 2)
+
+            if potential_loss == 0:
+                return SignalType.NEUTRAL 
+
+            risk_reward_ratio = net_potential_profit / potential_loss
+            
+            if risk_reward_ratio < Config.MIN_RISK_REWARD_RATIO:
+                return SignalType.NEUTRAL
+        
+        return signal
+
+    def analyze(self, now=None):
+        """
+        Main analysis loop. Executes the full process of data update,
+        indicator calculation, and decision making.
+        """
+        now = now or time.time()
+
+        if not self._update_market_data(now):
+            return SignalType.NEUTRAL
+
+        # --- Check for sufficient data ---
+        if (len(self.coin.med_price_history) < Config.VOLATILITY_WINDOW or
+            len(self.recent_buy_pressure) < Config.PRESSURE_WINDOW or
+            len(self.recent_volumes) < Config.VOLUME_WINDOW):
+            return SignalType.NEUTRAL
+
+        # --- Calculate indicators and make a decision ---
+        if not self._calculate_indicators():
+            return SignalType.NEUTRAL
+
+        final_signal = self._make_decision()
+        
+        # --- Update recent signals deque for next iteration's momentum ---
+        # Calculate raw signal based on current state to measure market sentiment
+        trade_score = (
+            (self.pressure_score * 0.5) +
+            (self.signal_momentum * 0.3) +
+            (self.volume_momentum * 0.2)
+        )
+        
+        raw_signal = SignalType.NEUTRAL
+        if trade_score > Config.BASE_DECISION_THRESHOLD:
+            raw_signal = SignalType.BUY
+        elif trade_score < -Config.BASE_DECISION_THRESHOLD:
+            raw_signal = SignalType.SELL
+        self.recent_signals.append(raw_signal)
+
+        self.last_decision = final_signal
+        return self.last_decision

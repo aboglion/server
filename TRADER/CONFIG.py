@@ -1,4 +1,5 @@
-import  os
+# CONFIG.py
+import os
 from enum import Enum
 from COIN.exchange_Connectors_Data import BinanceConnector, BybitConnector, OKXConnector
 
@@ -6,87 +7,58 @@ from COIN.exchange_Connectors_Data import BinanceConnector, BybitConnector, OKXC
 # קונפיגורציה – דינמית ומוכנה ל־API/N8N
 # =====================================================
 class Config:
+    """
+    Class to hold all configuration parameters for the trading bot.
+    Allows for easy tuning and dynamic adjustments.
+    """
+    # -- Exchange and Symbol Configuration --
+    EXCHANGES = {"binance": BinanceConnector(), "bybit": BybitConnector(), "okx": OKXConnector()}
+    SYMBOLS = ["BTCUSDT", "ETHUSDT", "XRPUSDT", "SOLUSDT"]
 
-    EXCHANGES = {"binance": BinanceConnector(),"bybit": BybitConnector(),"okx": OKXConnector() }
-    SYMBOLS =  ["BTCUSDT", "ETHUSDT", "XRPUSDT", "SOLUSDT"]
+    # -- Timing and Data History --
+    CYCLE_INTERVAL = 10  # Interval in seconds for processing coins.
+    HISTORY_LIMIT = int((15 * 60) / CYCLE_INTERVAL)  # Data retention for 15 minutes.
+    
+    # -- Technical Indicator Windows --
+    # Shorter window for recent, fast-changing momentum
+    MOMENTUM_WINDOW = 15 
+    # Medium window for pressure calculation, to get a stable trend
+    PRESSURE_WINDOW = 30
+    # Longer window for volume trend, to identify significant market activity shifts
+    VOLUME_WINDOW = 60
+    # Window for volatility calculation, based on historical price changes
+    VOLATILITY_WINDOW = int(HISTORY_LIMIT / 1.5)
 
-    CYCLE_INTERVAL = 10  # Interval in seconds for processing coins
-    HISTORY_LIMIT = int((10*60)/CYCLE_INTERVAL)  # Default retention time for graph data (10 minutes)
+    # -- Trade Decision Thresholds --
+    # The base score required to trigger a signal. Range: 0 to 1.
+    # Higher value means the bot is more "picky" and waits for stronger signals.
+    BASE_DECISION_THRESHOLD = 0.6 
+    
+    # -- Risk Management Parameters (CRITICAL) --
+    # The fee per trade (buy or sell). 0.1% = 0.001
+    FEE = 0.001 
+    # Take Profit percentage. A 1.2% target profit from the entry price.
+    TAKE_PROFIT_PCT = 0.012 # 1.2%
+    # Stop Loss percentage. A 0.8% max loss from the entry price.
+    STOP_LOSS_PCT = 0.008 # 0.8%
+    # Minimum required Risk/Reward ratio to enter a trade.
+    # Example: 1.5 means for every $1 of risk, we expect at least $1.5 of profit.
+    # This is a key filter to avoid bad trades.
+    MIN_RISK_REWARD_RATIO = 1.5
 
-    VOLATILITY_WINDOW = int(HISTORY_LIMIT/1.33)  # Number of price points to calculate volatility
-    BASE_THRESHOLD = 2
-    MAX_VOL_ADJ = 0.25 # Maximum volatility adjustment to the base threshold
-
-    recent_signals_len=10 # Number of last signals to consider for momentum calculation
-    recent_pressure_len = recent_signals_len*2 # Number of last buy pressures to consider for momentum calculation
-    recent_Volumes_len=recent_pressure_len*2
-    MIN_CONSEC_SIGNALS_postive = 3  # Minimum consecutive signals to consider a trade
-    MIN_CONSEC_SIGNALS_negative = 5  # Minimum consecutive signals to consider a trade
-    MIN_EXPECTED_PROFIT=0.5 # דרישת רווח פוטנציאלי מינימלית (יחס בין לחץ קנייה למכירה)
-    FEE = (0.15)/100  # Trading fee (0.15% for Binance, Bybit, OKX)
-    TAKE_profit_PCT = (0.6)/100 # 0.6% take profit (profit after fee)
-    STOP_LOSS_PCT = (1.7)/100 # 1.7% stop loss
-
+    # -- System and Database --
     DB_NAME = os.path.join(os.path.dirname(__file__), "dashboard_data", "DashboardData.db")
     PORT = 7070
     DEBUG = True
-    # Initialize the database if it doesn't exist
-    
-
 
 
 # =====================================================
-# איתותים
+# Signal Types Enum
 # =====================================================
 class SignalType(Enum):
+    """
+    Represents the possible trading signals.
+    """
     BUY = "BUY"
     SELL = "SELL"
     NEUTRAL = "NEUTRAL"
-
-
-
-
-
-# MOMENTUM_WINDOW:
-# לדוג' אם MOMENTUM_WINDOW=12, נשמרים 12 אותות אחרונים. אם רובם BUY, הבוט ייטה להוציא אות BUY.
-# self.recent_signals = deque([SignalType.NEUTRAL] * Config.MOMENTUM_WINDOW, maxlen=Config.MOMENTUM_WINDOW)
-# אם יש פחות מ־12 אותות, הבוט לא ייתן החלטה.
-# אם יש יותר מ־12, הבוט ישמור רק את 12 האחרונים.
-# =====================================================
-# VOLATILITY_WINDOW:
-# לדוג' אם VOLATILITY_WINDOW=24, הבוט יחשב תנודתיות על 24 מחירים ממוצעים אחרונים. אם יש פחות, לא תתבצע החלטה.
-# if history_len < Config.VOLATILITY_WINDOW:
-#     self.last_decision = SignalType.NEUTRAL
-# =====================================================
-# BASE_THRESHOLD:
-# לדוג' אם BASE_THRESHOLD=1.08, לחץ קנייה צריך להיות מעל 1.08 כדי להוציא BUY.
-# # אם לחץ מכירה מעל 1.08, הבוט ייתן אות SELL.
-# אם לחץ קנייה ומכירה שניהם מעל 1.08, הבוט י
-# threshold = Config.BASE_THRESHOLD + min(self.volatility * 100, Config.MAX_VOL_ADJ) * (1 + self.momentum)
-# =====================================================
-# MAX_VOL_ADJ:
-# # לדוג' אם MAX_VOL_ADJ=0.25, התנודתיות לא תעלה את הסף יותר מ־0.25.
-# אם התנודתיות גבוהה, הבוט יוסיף את התנודתיות לסף הבסיס, אך לא יעלה אותו יותר מ־0.25.
-# לדוג' אם התנודתיות גבוהה, MAX_VOL_ADJ=0.25 מגביל את ההתאמה לסף, כך שלא יעלה יותר מ-0.25 מעל הבסיס.
-# MIN_PCT_CHANGE:
-# לדוג' אם השינוי במחיר קטן מ-0.00015 (0.015%), לא תתבצע עסקה גם אם התקבלו אותות רצופים.
-# self.last_decision = final if pct_change >= Config.MIN_PCT_CHANGE else SignalType.NEUTRAL
-# =====================================================
-# MIN_PCT_CHANGE
-# לדוג' אם MIN_PCT_CHANGE=0.00015, הבוט ידרוש שינוי של לפחות 0.00015 (0.015%) במחיר כדי לבצע עסקה.
-# אם השינוי במחיר קטן מ־0.00015, הבוט לא ייתן
-# החלטה גם אם יש אותות רצופים.
-# =====================================================
-# MIN_CONSEC_SIGNALS:
-# לדוג' אם MIN_CONSEC_SIGNALS=2, הבוט ידרוש לפחות 2 אותות רצופים מאותו סוג כדי להוציא החלטה.
-# אם יש פחות מ־2 אותות רצופים, הבוט לא ייתן החלטה.
-# if self.consecutive >= Config.MIN_CONSEC_SIGNALS:
-#     pct_change = abs(self.med_price - self.signal_price) / self.signal_price if self.signal_price > 0 else 0.0
-#     self.last_decision = final if pct_change >= Config.MIN_PCT_CHANGE else SignalType.NEUTRAL         
-# =====================================================
-
-
-
-
-
-
