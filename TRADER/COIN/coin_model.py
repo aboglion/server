@@ -97,6 +97,7 @@ class Coin:
             self.bybit_price = self.calc.bybit_price()
             self.okx_price = self.calc.okx_price()
 
+            print(f"Coin.process_coin: {self.symbol} - Prices: Binance={self.binance_price}, Bybit={self.bybit_price}, OKX={self.okx_price}, Med={self.med_price}, Signal={self.signal}, Time={self.last_time_str}")
 
             # Assign calculated values to class members
             # Store current prices as previous prices before updating
