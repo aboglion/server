@@ -83,8 +83,11 @@ def live_data():
                     "trades": coin.trade_manager.trade_log if coin.trade_manager else []}
             print("collect data: ", pragsess)
     return (jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL}), 200)
-    
 
+@app.route("/trader/api/live", methods=["GET"])
+def trader_live_data():
+    print("trader_live_data")
+    return live_data()
 
 @app.route("/api/transactions/<symbol>", methods=["GET"])
 def get_transactions(symbol):
