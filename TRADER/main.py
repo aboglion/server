@@ -31,6 +31,7 @@ def trading_loop():
                         coin.reset_coin()
                     SQL_DB_DashboardData.reset_trades_sqlite()
                     os.remove("reset.flag")
+                    time.sleep(1)  # Give time for the reset to complete
                     continue
                 for coin_obj in ALL_Coins.Coins:
                     coin_obj.process_coin()
@@ -57,44 +58,33 @@ def live_data():
             if os.path.exists("reset.flag"):
                 result =None
             else:
+                # Load live data from SQLite
                 result = SQL_DB_DashboardData.load_all_data(Config.SYMBOLS, Config.HISTORY_LIMIT)
+                print("Loading live data from SQLite")
+                print(jsonify(result)) 
     except Exception as e:
         print(f"Error loading live data: {e}\n{traceback.format_exc()}")
         return jsonify({"error": "Failed to load live data"}), 500
+    
     if not result:
         print("No data found, initializing with empty structure.")
         result = {}
-        for symbol in Config.SYMBOLS:
-            result[symbol] = {
-                "symbol": symbol,
+        for coin in ALL_Coins.Coins:
+            result[coin.symbol] = {
+                "symbol": coin.symbol,
                 "binance_price": 0.0,
                 "momentum": 0.0,
                 "buy_pressure": 0.0,
                 "sell_pressure": 0.0,
-                "signal": "No Signal",
-                "position": "No Position",
-                "pnl_pct": 0.0,
-                "total_buy_trades": 0,
-                "total_sell_trades": 0,
-                "total_profit": 0.0,
-                "trades": []
+                "signal":  f"{(len(result[symbol].get('price_history', []))/Config.HISTORY_LIMIT)*100:.2f}%" if result[symbol].get("momentum")== 0.0 and result[symbol].get("buy_pressure") == 0.0 and result[symbol].get("sell_pressure") == 0.0 else "No Signal",
+                "position": coin.is_in_bought_Position,
+                "pnl_pct": coin.current_profit if coin.is_in_bought_Position else 0.0,
+                "total_buy_trades": coin.total_buy_trades,
+                "total_sell_trades": coin.total_sell_trades,
+                "total_profit": coin.total_profit,
+                "trades": coin.trade_manager.trade_log if coin.trade_manager else [],
             }
-    else:
-        for symbol in Config.SYMBOLS:
-            if result[symbol].get("momentum")== 0.0 and result[symbol].get("buy_pressure") == 0.0 and result[symbol].get("sell_pressure") == 0.0:
-                result[symbol].update({
-                    "symbol": symbol,
-                    "momentum": 0.0,
-                    "buy_pressure": 0.0,
-                    "sell_pressure": 0.0,
-                    "signal": "אוסף נתונים",
-                    "position": f"{(len(result[symbol].get('price_history', []))/Config.HISTORY_LIMIT)*100:.2f}% ",
-                    "pnl_pct": 0.0,
-                    "total_buy_trades": 0,
-                    "total_sell_trades": 0,
-                    "total_profit": 0.0,
-                    "trades": []
-            })
+           
     return jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL})
 
 @app.route("/api/transactions/<symbol>", methods=["GET"])
@@ -128,21 +118,22 @@ def n8n_hook():
     # Config.SYMBOLS = data["symbols"]
     return {"status": "configuration updated", "symbols": Config.SYMBOLS}
 
-# --- אתחול המערכת (פעם אחת בלבד) ---
-print("Initializing coins...")
-try:
-    for symbol in Config.SYMBOLS:
-        Coin(symbol)
-    for coin in ALL_Coins.Coins:
-        print(f"Successfully initialized coin: {coin.symbol}")
-        coin.restore_status_data()
-except Exception as e:
-    print(f"Error initializing coins: {e}\n{traceback.format_exc()}")
 
-print("Starting trading loop thread...")
-trading_thread = threading.Thread(target=trading_loop, daemon=True)
-trading_thread.start()
-print("Trading loop thread started successfully.")
+if __name__ == "__main__":
+    print("Initializing coins...")
+    try:
+        for symbol in Config.SYMBOLS:
+            Coin(symbol)
+        for coin in ALL_Coins.Coins:
+            print(f"Successfully initialized coin: {coin.symbol}")
+            coin.restore_status_data()
+    except Exception as e:
+        print(f"Error initializing coins: {e}\n{traceback.format_exc()}")
 
-# Note: If you use a production WSGI server like Gunicorn,
-# you will point it to this 'app' object (e.g., gunicorn --bind 0.0.0.0:7070 'app:app')
+    print("Starting trading loop thread...")
+    trading_thread = threading.Thread(target=trading_loop, daemon=True)
+    trading_thread.start()
+    print("Trading loop thread started successfully.")
+
+    # Note: If you use a production WSGI server like Gunicorn,
+    # you will point it to this 'app' object (e.g., gunicorn --bind 0.0.0.0:7070 'app:app')
