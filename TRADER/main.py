@@ -66,7 +66,7 @@ def live_data():
         print(f"Error loading live data: {e}\n{traceback.format_exc()}")
         return jsonify({"error": "Failed to load live data"}), 500
     
-    if not result or( result[0].get("buy_pressure") == 0.0 and result[0].get("sell_pressure") == 0.0):
+    if not result or( result[0][Config.SYMBOLS[0]].get("buy_pressure") == 0.0 and result[0][Config.SYMBOLS[0]].get("sell_pressure") == 0.0):
         print("No data found, initializing with empty structure.")
         result = {}
         for coin in ALL_Coins.Coins:
