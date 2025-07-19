@@ -212,10 +212,11 @@ class SQL_DB_DashboardData:
                 coin_obj.total_buy_trades = data[coin_obj.symbol]["total_buy_trades"]
                 coin_obj.total_sell_trades = data[coin_obj.symbol]["total_sell_trades"]
                 coin_obj.total_profit = data[coin_obj.symbol]["total_profit"]
-                coin_obj.med_price_history = data[coin_obj.symbol]["price_history"]
-                coin_obj.binance_history = data[coin_obj.symbol]["binance_history"]
-                coin_obj.bybit_history = data[coin_obj.symbol]["bybit_history"]
-                coin_obj.okx_history = data[coin_obj.symbol]["okx_history"]
+                from collections import deque
+                coin_obj.med_price_history = deque(data[coin_obj.symbol]["price_history"], maxlen=Config.HISTORY_LIMIT)
+                coin_obj.binance_history = deque(data[coin_obj.symbol]["binance_history"], maxlen=Config.HISTORY_LIMIT)
+                coin_obj.bybit_history = deque(data[coin_obj.symbol]["bybit_history"], maxlen=Config.HISTORY_LIMIT)
+                coin_obj.okx_history = deque(data[coin_obj.symbol]["okx_history"], maxlen=Config.HISTORY_LIMIT)
                 coin_obj.is_in_bought_Position = data[coin_obj.symbol]["is_in_bought_Position"]   
                 coin_obj.buyed_price = data[coin_obj.symbol]["buyed_price"]
                 coin_obj.last_buy_time = data[coin_obj.symbol]["last_buy_time"]
