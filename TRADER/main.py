@@ -67,7 +67,7 @@ def live_data():
     if result or any(coin.symbol not in result for coin in ALL_Coins.Coins):
             pragsess="0.00%"
             for coin in ALL_Coins.Coins:
-                pragsess = f"{(len(result[coin.symbol].get('price_history', []))/Config.HISTORY_LIMIT)*100:.2f}%"
+                pragsess = f"{(len(coin.med_price_history)/Config.HISTORY_LIMIT)*100:.2f}%"
                 result[coin.symbol] = {
                     "symbol": coin.symbol,
                     "binance_price": 0.0,
