@@ -100,7 +100,6 @@ class Coin:
             if med_price is not None and med_price > 0:
                 self.prev_med_price =self.med_price
                 self.med_price = med_price
-                print(f"[DEBUG] {self.symbol}: appending to med_price_history (now={now}, med_price={self.med_price}), orderbooks={self.orderbooks}")
                 self.med_price_history.append((now,self.med_price))
             else:
                 print(f"Coin.process_coin: Invalid med_price for {self.symbol}: {med_price}")

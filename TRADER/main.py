@@ -82,7 +82,7 @@ def live_data():
                 print(f"collect data: {coin.symbol} - error loading data")
     else:
         for coin in ALL_Coins.Coins:
-            pragsess = f"{(len(coin.med_price_history)/Config.HISTORY_LIMIT)*100:.2f}%"
+            pragsess = f"{(len(coin.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}%"
             result[coin.symbol]["signal"] = pragsess
             print(f"collect data: {coin.symbol} - {pragsess}")
 
