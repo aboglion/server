@@ -62,7 +62,6 @@ def live_data():
                 result = SQL_DB_DashboardData.load_all_data(Config.SYMBOLS, Config.HISTORY_LIMIT)
                 print("Loading live data from SQLite")
                 for r in result:
-                    print(f"Loaded coin: {r['symbol']}")
                     print(f"Loaded data: {r}")
                     print("------------------------------------")
 
