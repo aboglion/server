@@ -83,7 +83,7 @@ class TradeManager:
             # print(f"[{self.coin.symbol}] Not checking sell conditions: Not in bought position or buyed price is zero.")
             return False
         
-        if self.coin.current_profit >= Config.TAKE_profit_PCT and self.coin.signal != SignalType.BUY.name:
+        if self.coin.current_profit >= Config.TAKE_PROFIT_PCT and self.coin.signal != SignalType.BUY.name:
             print(f"[{self.coin.symbol}] Take Profit condition met.")
             return self.execute_sell("💰 TAKE_profit")
         
