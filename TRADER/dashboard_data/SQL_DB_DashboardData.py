@@ -187,7 +187,7 @@ class SQL_DB_DashboardData:
         return result
 
     @staticmethod
-    def restore_all_data():
+    def restore_all_data(ALL_Coins):
         """
         טוען את כל הנתונים עבור רשימת מטבעות.
         """
@@ -195,7 +195,6 @@ class SQL_DB_DashboardData:
         conn = sqlite3.connect(Config.DB_NAME)
         c = conn.cursor()
 
-        from COIN.coin_model import ALL_Coins
         for coin_obj in ALL_Coins.Coins:
             if coin_obj.symbol not in Config.SYMBOLS:
                 continue
