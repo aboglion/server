@@ -71,7 +71,6 @@ class Coin:
                 
 
     def process_coin(self):
-        print(f"[DEBUG] process_coin called for {self.symbol}")
         try:
             now = time.time()
             books = {}
@@ -79,7 +78,6 @@ class Coin:
             for ex, connector in Config.EXCHANGES.items():
                 try:
                     fetched = connector.fetch(self.symbol)
-                    print(f"[DEBUG] {self.symbol} {ex} fetch result: {fetched}")
                     self.orderbooks[ex] = fetched
                     self.last_time_str = datetime.fromtimestamp(now, ZoneInfo("Asia/Jerusalem")).strftime("%H:%M:%S")
                     fanched = True
@@ -95,7 +93,6 @@ class Coin:
             self.signal = signal.name if signal else "UNKNOWN"
 
             self.med_price = self.calc.calculate_med_price()
-            print(f"[DEBUG] {self.symbol} med_price: {self.med_price}, prev_med_price: {getattr(self, 'prev_med_price', None)}")
             self.binance_price = self.calc.binance_price()
             self.bybit_price = self.calc.bybit_price()
             self.okx_price = self.calc.okx_price()
@@ -113,7 +110,6 @@ class Coin:
 
 
             if self.med_price is not None  and  self.prev_med_price != self.med_price and self.med_price>0:
-                print(f"[DEBUG] {self.symbol} saving to DB (med_price changed and >0)")
                 self.trade_manager.check_selling_cond()
                 self.trade_manager.check_buying_cond()
                 SQL_DB_DashboardData.save_all_data(self)

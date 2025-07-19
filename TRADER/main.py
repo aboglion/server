@@ -75,7 +75,7 @@ def live_data():
                     "buy_pressure": 0.0,
                     "sell_pressure": 0.0,
                     "signal":  pragsess,
-                    "position": coin.is_in_bought_Position,
+                    "position": "[💰_IN_@]" if coin.is_in_bought_Position else "[⏳_OUT_@]",
                     "pnl_pct": coin.current_profit if coin.is_in_bought_Position else 0.0,
                     "total_buy_trades": coin.total_buy_trades,
                     "total_sell_trades": coin.total_sell_trades,
