@@ -278,7 +278,7 @@ async function createEnlargedChart(canvas, symbol, metric, resultsCache, clearBu
 // -- שליפת נתונים עיקריים --
 async function fetchData() {
   try {
-    const res = await fetch('/api/live');
+    const res = await fetch('/trader/api/live');
     if (!res.ok) {
       console.error("HTTP error!", res.status);
       return null;
@@ -293,25 +293,14 @@ async function fetchData() {
 
 // -- שליפת נקודות מסחר לכל סימבול --
 async function fetchTradePoints(symbol, cache = null) {
+  // Always use cache, never fetch again
   if (cache && cache[symbol]) {
     return {
       buyPoints: cache[symbol].buyPoints || [],
       sellPoints: cache[symbol].sellPoints || []
     };
   }
-  try {
-    const res = await fetch('/api/live');
-    if (!res.ok) return { buyPoints: [], sellPoints: [] };
-    const results = await res.json();
-    if (results.data && results.data[symbol]) {
-      return {
-        buyPoints: results.data[symbol].buyPoints || [],
-        sellPoints: results.data[symbol].sellPoints || []
-      };
-    }
-  } catch (e) {
-    console.error("Error fetching trade points:", e);
-  }
+  // If no cache, return empty arrays (no extra fetch)
   return { buyPoints: [], sellPoints: [] };
 }
 
