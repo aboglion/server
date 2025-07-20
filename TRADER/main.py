@@ -24,16 +24,16 @@ def trading_loop():
     try:
         while True:
             start_time = time.time()
-            with coins_lock:
-                if os.path.exists("reset.flag"):
-                    for coin in ALL_Coins.Coins:
-                        coin.trade_manager.reset_trades()
-                        coin.reset_coin()
-                    SQL_DB_DashboardData.reset_trades_sqlite()
-                    os.remove("reset.flag")
-                    time.sleep(1)  # Give time for the reset to complete
-                    continue
-                for coin_obj in ALL_Coins.Coins:
+            # with coins_lock:
+            #     if os.path.exists("reset.flag"):
+            #         for coin in ALL_Coins.Coins:
+            #             coin.trade_manager.reset_trades()
+            #             coin.reset_coin()
+            #         SQL_DB_DashboardData.reset_trades_sqlite()
+            #         os.remove("reset.flag")
+            #         time.sleep(1)  # Give time for the reset to complete
+            #         continue
+            for coin_obj in ALL_Coins.Coins:
                     coin_obj.process_coin()
             elapsed_time = time.time() - start_time
             sleep_time = max(0, Config.CYCLE_INTERVAL - elapsed_time)
