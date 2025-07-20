@@ -82,7 +82,6 @@ def live_data():
                 print(f"collect data: {coin.symbol} - error loading data")
     else:
         for coin in ALL_Coins.Coins:
-            print(coin.symbol, "len(coin.med_price_history)",coin, len(coin.med_price_history),"live_data")
             pragsess = f"{(len(coin.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}%"
             result[coin.symbol]["signal"] = pragsess
             if coin.symbol=="BTCUSDT":
