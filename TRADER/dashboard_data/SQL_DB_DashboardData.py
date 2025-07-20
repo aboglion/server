@@ -102,7 +102,7 @@ class SQL_DB_DashboardData:
                 getattr(coin_obj.signal_state, 'momentum', 0.0),
                 getattr(coin_obj.signal_state, 'buy_pressure', 0.0) ,
                 getattr(coin_obj.signal_state, 'sell_pressure', 0.0),
-                "[💰 IN]" if coin_obj.is_in_bought_Position else "[⏳ OUT]",
+                "[💰 IN]" if coin_obj.is_in_bought_Position else "[⏳_ OUT]",
                 coin_obj.current_profit,
                 coin_obj.total_buy_trades,
                 coin_obj.total_sell_trades,
