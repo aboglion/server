@@ -85,7 +85,7 @@ def live_data():
             pragsess = f"{(len(coin.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}%"
             result[coin.symbol]["signal"] = pragsess
             if coin.symbol=="BTCUSDT":
-                 print(f" {coin}, {coin.med_price}, binance_price: {coin.binance_price}, bybit_price: {coin.bybit_price}, okx_price: {coin.okx_price}, signal: {coin.signal}")
+                 print(f"[1] {coin}, {coin.med_price}, binance_price: {coin.binance_price}, bybit_price: {coin.bybit_price}, okx_price: {coin.okx_price}, signal: {coin.signal}")
 
     return (jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL}), 200)
 
