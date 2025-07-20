@@ -137,6 +137,8 @@ class Coin:
                 self.trade_manager.check_selling_cond()
                 self.trade_manager.check_buying_cond()
                 SQL_DB_DashboardData.save_all_data(self)
+            else:
+                print(f"Coin.process_coin: No price change for {self.symbol}, skipping trade checks.")
 
 
         

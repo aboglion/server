@@ -139,7 +139,6 @@ class SQL_DB_DashboardData:
                 INSERT OR IGNORE INTO okx_history (symbol, timestamp, price)
                 VALUES (?, ?, ?)
             """, (coin_obj.symbol, ts, price))
-        print(f"Initialized DB for {coin_obj.symbol}")
         conn.commit()
     
  
