@@ -197,6 +197,7 @@ class SQL_DB_DashboardData:
 
         for coin_obj in ALL_Coins.Coins:
             if coin_obj.symbol not in Config.SYMBOLS:
+                print(f"Skipping {coin_obj.symbol} as it is not in Config.SYMBOLS")
                 continue
             c.execute("SELECT * FROM stats WHERE symbol=?", (coin_obj.symbol,))
             data= SQL_DB_DashboardData.load_all_data(Config.SYMBOLS, Config.HISTORY_LIMIT)
@@ -226,15 +227,9 @@ class SQL_DB_DashboardData:
         conn = sqlite3.connect(Config.DB_NAME)
         c = conn.cursor()
 
-        # חישוב רווח לעסקת מכירה
-        if action.lower() == "sell":
-            net_profit = (coin.binance_price - coin.buyed_price) / coin.buyed_price - (Config.FEE * 2)
-        else:
-            net_profit = None
-
         c.execute(
             "INSERT INTO trades (symbol, action, price, timestamp, reason, signal, net_profit) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (coin.symbol, action, coin.binance_price, coin.last_time_str, reason, coin.signal, net_profit)
+            (coin.symbol, action, coin.binance_price, coin.last_time_str, reason, coin.signal, coin.current_profit if action.lower() == "sell" else None)
         )
         conn.commit()
         # Log progress after recording a trade

@@ -94,16 +94,13 @@ class Coin:
             self.signal = signal.name if signal else "UNKNOWN"
 
             med_price = self.calc.calculate_med_price()
-            print(f"[DEBUG] {self.symbol}: med_price from calculate_med_price = {med_price}")
             binance_price = self.calc.binance_price()
             bybit_price = self.calc.bybit_price()
             okx_price = self.calc.okx_price()
             if med_price is not None and med_price > 0:
                 self.prev_med_price =self.med_price
                 self.med_price = med_price
-                print(f"[DEBUG] {self.symbol}: type(med_price_history)={type(self.med_price_history)}")
                 self.med_price_history.append((now,self.med_price))
-                print(f"[DEBUG] {self.symbol}: med_price_history after append = {list(self.med_price_history)}")
             else:
                 print(f"Coin.process_coin: Invalid med_price for {self.symbol}: {med_price}")
                 return
@@ -135,6 +132,7 @@ class Coin:
                 self.trade_manager.check_buying_cond()
                 SQL_DB_DashboardData.save_all_data(self)
 
+            print(self.symbol, "len(coin.med_price_history)", self, len(self.med_price_history), "coin.process_coin")
 
 
         except Exception as e:
