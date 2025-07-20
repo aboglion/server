@@ -61,7 +61,6 @@ def live_data():
             else:
                 # Load live data from SQLite
                 result = SQL_DB_DashboardData.load_all_data()
-                print(result)
 
     except Exception as e:
         print(f"Error loading live data: {e}\n{traceback.format_exc()}")

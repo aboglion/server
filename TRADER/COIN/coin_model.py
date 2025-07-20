@@ -90,12 +90,14 @@ class Coin:
                 print(f"no data fetched for any exchange market for {self.symbol}")
                 return
             
-
+            print("before calc med_price")
 
             med_price = self.calc.calculate_med_price()
             binance_price = self.calc.binance_price()
             bybit_price = self.calc.bybit_price()
             okx_price = self.calc.okx_price()
+            print("after calc med_price")
+
             if med_price is not None and med_price > 0:
                 self.prev_med_price =self.med_price
                 self.med_price = med_price
