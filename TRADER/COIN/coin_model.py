@@ -127,11 +127,12 @@ class Coin:
                 return
 
                 
-            if self.med_price is not None  and  self.prev_med_price != self.med_price and self.med_price>0:
+            if  self.prev_med_price != self.med_price :
                 self.trade_manager.check_selling_cond()
                 self.trade_manager.check_buying_cond()
                 SQL_DB_DashboardData.save_all_data(self)
-            else:
+
+            elif len(self.med_price_history) < Config.HISTORY_LIMIT:
                 progress = f"{(len(self.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}%"
                 self.signal= progress
                 print(f"Coin.process_coin: Progress for {self.symbol}: {progress} [{self.prev_med_price}  {self.med_price}]")
