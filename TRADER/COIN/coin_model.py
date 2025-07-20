@@ -91,6 +91,8 @@ class Coin:
                 return
             
             signal=self.signal_state.analyze(now)
+            if not signal:
+                print(f"Coin.process_coin: No valid signal for {self.symbol}")
             self.signal = signal.name if signal else "UNKNOWN"
 
             med_price = self.calc.calculate_med_price()
