@@ -133,7 +133,7 @@ class Coin:
                 SQL_DB_DashboardData.save_all_data(self)
 
             if self.symbol=="BTCUSDT":
-                print(f"[2] {self}, {self.med_price}, binance_price: {self.binance_price}, bybit_price: {self.bybit_price}, okx_price: {self.okx_price}, signal: {self.signal}")
+                print(f"[2] {self.last_time_str}{self}, {self.med_price}, binance_price: {self.binance_price}, bybit_price: {self.bybit_price}, okx_price: {self.okx_price}, signal: {self.signal}")
 
         except Exception as e:
             # Log the error and set class members to error states

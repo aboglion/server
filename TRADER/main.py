@@ -24,16 +24,16 @@ def trading_loop():
     try:
         while True:
             start_time = time.time()
-            # with coins_lock:
-            #     if os.path.exists("reset.flag"):
-            #         for coin in ALL_Coins.Coins:
-            #             coin.trade_manager.reset_trades()
-            #             coin.reset_coin()
-            #         SQL_DB_DashboardData.reset_trades_sqlite()
-            #         os.remove("reset.flag")
-            #         time.sleep(1)  # Give time for the reset to complete
-            #         continue
-            for coin_obj in ALL_Coins.Coins:
+            with coins_lock:
+                if os.path.exists("reset.flag"):
+                    for coin in ALL_Coins.Coins:
+                        coin.trade_manager.reset_trades()
+                        coin.reset_coin()
+                    SQL_DB_DashboardData.reset_trades_sqlite()
+                    os.remove("reset.flag")
+                    time.sleep(1)  # Give time for the reset to complete
+                    continue
+                for coin_obj in ALL_Coins.Coins:
                     coin_obj.process_coin()
             elapsed_time = time.time() - start_time
             sleep_time = max(0, Config.CYCLE_INTERVAL - elapsed_time)
@@ -85,7 +85,7 @@ def live_data():
             pragsess = f"{(len(coin.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}%"
             result[coin.symbol]["signal"] = pragsess
             if coin.symbol=="BTCUSDT":
-                 print(f"[1] {coin}, {coin.med_price}, binance_price: {coin.binance_price}, bybit_price: {coin.bybit_price}, okx_price: {coin.okx_price}, signal: {coin.signal}")
+                 print(f"[1] {coin.last_time_str} {coin}, {coin.med_price}, binance_price: {coin.binance_price}, bybit_price: {coin.bybit_price}, okx_price: {coin.okx_price}, signal: {coin.signal}")
 
     return (jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL}), 200)
 
