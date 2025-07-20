@@ -85,8 +85,8 @@ def live_data():
 
     for coin in ALL_Coins.Coins:
         if len(coin.med_price_history) < Config.HISTORY_LIMIT:
-            progress = f"{(len(coin.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}%"
-            result[coin.symbol]["signal"] = progress  
+            progress = f"{(len(coin.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}"
+            result[coin.symbol]["signal"] = progress+ "%"
             result[coin.symbol]["position"] = "collecting data.."
             result[coin.symbol]["pnl_pct"] = progress  
 
