@@ -10,4 +10,4 @@ COPY . .
 
 # Change 'app:app' to '[your_filename]:app'
 # For example, if your file is main.py, use 'main:app'
-CMD ["gunicorn", "--bind", "0.0.0.0:7070", "--workers", "3", "--preload", "main:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:7070", "--workers", "1", "--preload", "main:app"]
