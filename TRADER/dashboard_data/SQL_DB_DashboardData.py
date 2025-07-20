@@ -200,8 +200,29 @@ class SQL_DB_DashboardData:
                 print(f"Skipping {coin_obj.symbol} as it is not in Config.SYMBOLS")
                 continue
             c.execute("SELECT * FROM stats WHERE symbol=?", (coin_obj.symbol,))
-            data= SQL_DB_DashboardData.load_all_data(Config.SYMBOLS, Config.HISTORY_LIMIT)
-            if data:
+            data= SQL_DB_DashboardData.load_all_data()
+
+            if not data or any(coin.symbol not in data for coin in ALL_Coins.Coins):
+                    for coin in ALL_Coins.Coins:
+                        data[coin.symbol] = {
+                            "symbol": coin.symbol,
+                            "binance_price": 0.0,
+                            "momentum": 0.0,
+                            "buy_pressure": 0.0,
+                            "sell_pressure": 0.0,
+                            "signal":  "error loading data",
+                            "position": "[💰_IN_@]" if coin.is_in_bought_Position else "[⏳_OUT_@]",
+                            "pnl_pct": coin.current_profit if coin.is_in_bought_Position else 0.0,
+                            "total_buy_trades": coin.total_buy_trades,
+                            "total_sell_trades": coin.total_sell_trades,
+                            "total_profit": coin.total_profit,
+                            "trades": coin.trade_manager.trade_log if coin.trade_manager else []}
+                        print(f"collect data: {coin.symbol} - error loading data")
+            else:
+                for coin in ALL_Coins.Coins:
+                    if len(coin.med_price_history)<Config.HISTORY_LIMIT:
+                        progress = f"{(len(coin.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}%"
+                        data[coin.symbol]["signal"] = progress
                 coin_obj.med_price = data[coin_obj.symbol]["med_price"]
                 coin_obj.binance_price = data[coin_obj.symbol]["binance_price"]
                 coin_obj.bybit_price = data[coin_obj.symbol]["bybit_price"]
@@ -220,7 +241,7 @@ class SQL_DB_DashboardData:
                 coin_obj.is_in_bought_Position = data[coin_obj.symbol]["is_in_bought_Position"]   
                 coin_obj.buyed_price = data[coin_obj.symbol]["buyed_price"]
                 coin_obj.last_buy_time = data[coin_obj.symbol]["last_buy_time"]
-
+                
     @staticmethod
     def record_trade(coin,action,reason=None):
         initialize_dashboard_db()

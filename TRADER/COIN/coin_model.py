@@ -131,6 +131,10 @@ class Coin:
                 self.trade_manager.check_selling_cond()
                 self.trade_manager.check_buying_cond()
                 SQL_DB_DashboardData.save_all_data(self)
+            else:
+                progress = f"{(len(self.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}%"
+                self.signal= progress
+                print(f"Coin.process_coin: Progress for {self.symbol}: {progress}")
 
         
         except Exception as e:

@@ -80,11 +80,7 @@ def live_data():
                     "total_profit": coin.total_profit,
                     "trades": coin.trade_manager.trade_log if coin.trade_manager else []}
                 print(f"collect data: {coin.symbol} - error loading data")
-    else:
-        for coin in ALL_Coins.Coins:
-            pragsess = f"{(len(coin.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}%"
-            result[coin.symbol]["signal"] = pragsess
-     
+
     return (jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL}), 200)
 
 @app.route("/trader/api/live", methods=["GET"])
