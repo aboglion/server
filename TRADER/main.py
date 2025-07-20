@@ -57,9 +57,11 @@ def live_data():
         with coins_lock:
             if os.path.exists("reset.flag"):
                 result =None
+                print("Reset flag detected, returning empty data.")
             else:
                 # Load live data from SQLite
                 result = SQL_DB_DashboardData.load_all_data()
+                print(result)
 
     except Exception as e:
         print(f"Error loading live data: {e}\n{traceback.format_exc()}")

@@ -90,8 +90,7 @@ class Coin:
                 print(f"no data fetched for any exchange market for {self.symbol}")
                 return
             
-            signal=self.signal_state.analyze(now)
-            self.signal = signal.name if signal else "NO_SIGNAL"
+
 
             med_price = self.calc.calculate_med_price()
             binance_price = self.calc.binance_price()
@@ -126,16 +125,19 @@ class Coin:
                 print(f"Coin.process_coin: Invalid okx_price for {self.symbol}: {okx_price}")
                 return
 
-                
+            if len(self.med_price_history) < Config.HISTORY_LIMIT:
+                progress = f"{(len(self.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}%"
+                self.signal= progress
+                print(f"Coin.process_coin: Progress for {self.symbol}: {progress} [{self.prev_med_price}  {self.med_price}]")
+                return
+            
+            signal=self.signal_state.analyze(now)
+            self.signal = signal.name if signal else "NO_SIGNAL"
             if  self.prev_med_price != self.med_price :
                 self.trade_manager.check_selling_cond()
                 self.trade_manager.check_buying_cond()
                 SQL_DB_DashboardData.save_all_data(self)
 
-            elif len(self.med_price_history) < Config.HISTORY_LIMIT:
-                progress = f"{(len(self.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}%"
-                self.signal= progress
-                print(f"Coin.process_coin: Progress for {self.symbol}: {progress} [{self.prev_med_price}  {self.med_price}]")
 
         
         except Exception as e:

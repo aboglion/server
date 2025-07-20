@@ -135,7 +135,6 @@ class SQL_DB_DashboardData:
                 INSERT OR IGNORE INTO okx_history (symbol, timestamp, price)
                 VALUES (?, ?, ?)
             """, (coin_obj.symbol, ts, price))
-        print(f"SQL_DB_DashboardData.save_all_data: Saved data for {coin_obj.symbol} at {coin_obj.last_time_str}")
         conn.commit()
     
  
