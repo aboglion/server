@@ -132,9 +132,7 @@ class Coin:
                 self.trade_manager.check_buying_cond()
                 SQL_DB_DashboardData.save_all_data(self)
 
-            if self.symbol=="BTCUSDT":
-                print(f"[2] PID={os.getpid()}  {self.last_time_str}{self}, {self.med_price}, binance_price: {self.binance_price}, bybit_price: {self.bybit_price}, okx_price: {self.okx_price}, signal: {self.signal}")
-
+        
         except Exception as e:
             # Log the error and set class members to error states
             print(f"Coin.process_coin: Error processing coin {self.symbol}: {e}")
