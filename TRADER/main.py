@@ -136,13 +136,14 @@ try:
     for coin in ALL_Coins.Coins:
         print(f"Successfully initialized coin: {coin.symbol}")
         coin.restore_status_data()
+        coin.process_coin()
 except Exception as e:
     print(f"Error initializing coins: {e}\n{traceback.format_exc()}")
 
-print("Starting trading loop thread...")
-trading_thread = threading.Thread(target=trading_loop, daemon=True)
-trading_thread.start()
-print("Trading loop thread started successfully.")
+# print("Starting trading loop thread...")
+# trading_thread = threading.Thread(target=trading_loop, daemon=True)
+# trading_thread.start()
+# print("Trading loop thread started successfully.")
 
 # Note: If you use a production WSGI server like Gunicorn,
 # you will point it to this 'app' object (e.g., gunicorn --bind 0.0.0.0:7070 'app:app')
