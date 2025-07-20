@@ -87,6 +87,7 @@ class SQL_DB_DashboardData:
         conn = sqlite3.connect(Config.DB_NAME)
         c = conn.cursor()
 
+
             # שמור סטטיסטיקות
         c.execute("""
                 INSERT OR REPLACE INTO stats (
@@ -138,6 +139,7 @@ class SQL_DB_DashboardData:
                 INSERT OR IGNORE INTO okx_history (symbol, timestamp, price)
                 VALUES (?, ?, ?)
             """, (coin_obj.symbol, ts, price))
+        print(f"Initialized DB for {coin_obj.symbol}")
         conn.commit()
     
  
