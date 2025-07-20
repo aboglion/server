@@ -92,7 +92,7 @@ class SQL_DB_DashboardData:
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?)
             """, (
                 coin_obj.symbol,
-                coin_obj.med_price,
+                99909,
                 coin_obj.binance_price,
                 coin_obj.bybit_price,
                 coin_obj.okx_price,
