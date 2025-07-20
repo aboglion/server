@@ -88,7 +88,6 @@ def live_data():
             progress = f"{(len(coin.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}"
             result[coin.symbol]["signal"] = progress+ "%"
             result[coin.symbol]["position"] = "collecting data.."
-            result[coin.symbol]["pnl_pct"] = progress  
 
     return (jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL}), 200)
 
