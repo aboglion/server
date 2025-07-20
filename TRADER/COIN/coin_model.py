@@ -126,11 +126,12 @@ class Coin:
                 return
 
             if len(self.med_price_history) < Config.HISTORY_LIMIT:
-                progress = f"{(len(self.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}%"
-                self.signal= progress
-                print(f"Coin.process_coin: Progress for {self.symbol}: {progress} [{self.prev_med_price}  {self.med_price}]")
+                if self.symbol == Config.SYMBOLS[0]:
+                    progress = f"{(len(self.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}%"
+                    self.signal= progress
+                    print(f"Progress collecting data {progress} ")
                 return
-            
+
             signal=self.signal_state.analyze(now)
             self.signal = signal.name if signal else "NO_SIGNAL"
             if  self.prev_med_price != self.med_price :

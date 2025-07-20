@@ -85,9 +85,11 @@ def live_data():
 
     for coin in ALL_Coins.Coins:
         if len(coin.med_price_history) < Config.HISTORY_LIMIT:
-            prgsess = f"{(len(coin.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}%"
-            result[coin.symbol]["signal"] = prgsess  
+            progress = f"{(len(coin.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}%"
+            result[coin.symbol]["signal"] = progress  
             result[coin.symbol]["position"] = "collecting data.."
+            result[coin.symbol]["pnl_pct"] = progress  
+
     return (jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL}), 200)
 
 @app.route("/trader/api/live", methods=["GET"])
