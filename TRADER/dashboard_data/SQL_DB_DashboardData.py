@@ -80,7 +80,10 @@ class SQL_DB_DashboardData:
         שמירה מסונכרנת: כל מטבע נשמר עם timestamp לפי last_time_str שלו.
         שמירה אחת בלבד כל 20 שניות לכל מטבע.
         """
-        initialize_dashboard_db()
+        if not os.path.exists(Config.DB_NAME):
+            print(f"Database {Config.DB_NAME} does not exist. Initializing...")
+            initialize_dashboard_db()
+            os.chmod(Config.DB_NAME, 0o664)
         conn = sqlite3.connect(Config.DB_NAME)
         c = conn.cursor()
 
@@ -92,7 +95,7 @@ class SQL_DB_DashboardData:
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?)
             """, (
                 coin_obj.symbol,
-                99909,
+                coin_obj.med_price,
                 coin_obj.binance_price,
                 coin_obj.bybit_price,
                 coin_obj.okx_price,
