@@ -132,8 +132,8 @@ class Coin:
                 self.trade_manager.check_buying_cond()
                 SQL_DB_DashboardData.save_all_data(self)
 
-            print(self.symbol, "len(coin.med_price_history)", self, len(self.med_price_history), "coin.process_coin")
-
+            if self.symbol=="BTCUSDT":
+                print(f" {self}, {self.med_price}, binance_price: {self.binance_price}, bybit_price: {self.bybit_price}, okx_price: {self.okx_price}, signal: {self.signal}")
 
         except Exception as e:
             # Log the error and set class members to error states

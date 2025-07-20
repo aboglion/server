@@ -85,10 +85,9 @@ def live_data():
             print(coin.symbol, "len(coin.med_price_history)",coin, len(coin.med_price_history),"live_data")
             pragsess = f"{(len(coin.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}%"
             result[coin.symbol]["signal"] = pragsess
-            print(f"collect data: {coin.symbol} - {pragsess} (len={len(coin.med_price_history)}, HISTORY_LIMIT={Config.HISTORY_LIMIT})")
+            if coin.symbol=="BTCUSDT":
+                 print(f" {coin}, {coin.med_price}, binance_price: {coin.binance_price}, bybit_price: {coin.bybit_price}, okx_price: {coin.okx_price}, signal: {coin.signal}")
 
-                
-    
     return (jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL}), 200)
 
 @app.route("/trader/api/live", methods=["GET"])
