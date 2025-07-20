@@ -134,7 +134,7 @@ class Coin:
             else:
                 progress = f"{(len(self.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}%"
                 self.signal= progress
-                print(f"Coin.process_coin: Progress for {self.symbol}: {progress}")
+                print(f"Coin.process_coin: Progress for {self.symbol}: {progress} [{self.prev_med_price}  {self.med_price}]")
 
         
         except Exception as e:
