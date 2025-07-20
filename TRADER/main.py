@@ -127,23 +127,20 @@ def n8n_hook():
 
 
 # --- Initialization for all environments (development & production) ---
-import os
-print(f"🔥 MAIN STARTED | PID={os.getpid()}")
-print("Initializing coins...")
-try:
-    for symbol in Config.SYMBOLS:
-        Coin(symbol)
-    for coin in ALL_Coins.Coins:
-        print(f"Successfully initialized coin: {coin.symbol}")
-        coin.restore_status_data()
-        coin.process_coin()
-except Exception as e:
-    print(f"Error initializing coins: {e}\n{traceback.format_exc()}")
 
-# print("Starting trading loop thread...")
-# trading_thread = threading.Thread(target=trading_loop, daemon=True)
-# trading_thread.start()
-# print("Trading loop thread started successfully.")
+def init_all_coins():
+    print("Initializing coins...")
+    try:
+        for symbol in Config.SYMBOLS:
+            Coin(symbol)
+        for coin in ALL_Coins.Coins:
+            print(f"Successfully initialized coin: {coin.symbol}")
+            coin.restore_status_data()
+            
+    except Exception as e:
+        print(f"Error initializing coins: {e}\n{traceback.format_exc()}")
+
+#we run the trading loop in a separate thread using the gunicorn_conf.py config file
 
 # Note: If you use a production WSGI server like Gunicorn,
 # you will point it to this 'app' object (e.g., gunicorn --bind 0.0.0.0:7070 'app:app')
