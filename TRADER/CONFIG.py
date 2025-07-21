@@ -34,7 +34,7 @@ class Config:
     # -- Trade Decision Thresholds --
     # The base score required to trigger a signal. Range: 0 to 1.
     # Higher value means the bot is more "picky" and waits for stronger signals.
-    BASE_DECISION_THRESHOLD = 1.8 
+    BASE_DECISION_THRESHOLD = 1.7
     
     # -- Risk Management Parameters (CRITICAL) --
     # The fee per trade (buy or sell). 0.1% = 0.001
