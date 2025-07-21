@@ -33,6 +33,10 @@ class SignalDecisionEngine:
         self.signal_momentum = 0.0
         self.pressure_score = 0.0
         self.volume_momentum = 0.0
+          # --- Pressure Analysis ---
+        self.buy_pressure = 0
+        self.sell_pressure = 0
+        self.momentum = 0.0
 
     def _update_market_data(self, now):
         """Fetches and updates the latest market prices and volumes."""
@@ -73,9 +77,9 @@ class SignalDecisionEngine:
         self.signal_momentum = (buy_signals - sell_signals) / total_signals if total_signals > 0 else 0.0
 
         # --- Pressure Analysis ---
-        median_buy_pressure = statistics.median(self.recent_buy_pressure)
-        median_sell_pressure = statistics.median(self.recent_sell_pressure)
-        self.pressure_score = (median_buy_pressure - median_sell_pressure) / (median_buy_pressure + median_sell_pressure + 1e-9)
+        self.buy_pressure = statistics.median(self.recent_buy_pressure)
+        self.sell_pressure = statistics.median(self.recent_sell_pressure)
+        self.pressure_score = (self.buy_pressure - self.sell_pressure) / (self.buy_pressure + self.sell_pressure + 1e-9)
 
         # --- Volume Momentum ---
         split_point = len(volumes_list) // 2
@@ -94,7 +98,7 @@ class SignalDecisionEngine:
         No longer needs arguments as it uses 'self'.
         """
         # --- Weighted Trade Score ---
-        trade_score = (
+        self.momentum = (
             (self.pressure_score * 0.5) +
             (self.signal_momentum * 0.3) +
             (self.volume_momentum * 0.2)
@@ -105,9 +109,9 @@ class SignalDecisionEngine:
         decision_threshold = Config.BASE_DECISION_THRESHOLD + volatility_adjustment
 
         signal = SignalType.NEUTRAL
-        if trade_score > decision_threshold:
+        if self.momentum > decision_threshold:
             signal = SignalType.BUY
-        elif trade_score < -decision_threshold:
+        elif self.momentum < -decision_threshold:
             signal = SignalType.SELL
 
         # --- CRITICAL: Risk/Reward Filter ---
@@ -150,16 +154,16 @@ class SignalDecisionEngine:
         
         # --- Update recent signals deque for next iteration's momentum ---
         # Calculate raw signal based on current state to measure market sentiment
-        trade_score = (
+        self.momentum = (
             (self.pressure_score * 0.5) +
             (self.signal_momentum * 0.3) +
             (self.volume_momentum * 0.2)
         )
         
         raw_signal = SignalType.NEUTRAL
-        if trade_score > Config.BASE_DECISION_THRESHOLD:
+        if self.momentum > Config.BASE_DECISION_THRESHOLD:
             raw_signal = SignalType.BUY
-        elif trade_score < -Config.BASE_DECISION_THRESHOLD:
+        elif self.momentum < -Config.BASE_DECISION_THRESHOLD:
             raw_signal = SignalType.SELL
         self.recent_signals.append(raw_signal)
 

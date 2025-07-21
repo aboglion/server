@@ -62,7 +62,6 @@ def initialize_dashboard_db():
             total_buy_trades INTEGER,
             total_sell_trades INTEGER,
             total_profit REAL,
-            is_in_bought_Position BOOLEAN DEFAULT FALSE,
             buyed_price REAL DEFAULT 0.0,
             last_buy_time TEXT DEFAULT ""
         )
@@ -92,8 +91,8 @@ class SQL_DB_DashboardData:
         c.execute("""
                 INSERT OR REPLACE INTO stats (
                     symbol, med_price, binance_price, bybit_price, okx_price, signal, last_time_str, current_profit,
-                    momentum, buy_pressure, sell_pressure, position, pnl_pct, total_buy_trades, total_sell_trades, total_profit,is_in_bought_Position, buyed_price,last_buy_time
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?)
+                    momentum, buy_pressure, sell_pressure, position, pnl_pct, total_buy_trades, total_sell_trades, total_profit, buyed_price,last_buy_time
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 coin_obj.symbol,
                 coin_obj.med_price,
@@ -103,17 +102,15 @@ class SQL_DB_DashboardData:
                 coin_obj.signal,
                 coin_obj.last_time_str,
                 coin_obj.current_profit,
-                getattr(coin_obj.signal_state, 'momentum', 0.0),
-                getattr(coin_obj.signal_state, 'buy_pressure', 0.0) ,
-                getattr(coin_obj.signal_state, 'sell_pressure', 0.0),
-                "[💰 IN]" if coin_obj.is_in_bought_Position else "[⏳_ OUT]",
-                coin_obj.current_profit,
+                coin_obj.signal_state.momentum,
+                coin_obj.signal_state.buy_pressure,
+                coin_obj.signal_state.sell_pressure,
+                "[💰.IN]" if coin_obj.is_in_bought_Position else "[⏳.OUT]",
                 coin_obj.total_buy_trades,
                 coin_obj.total_sell_trades,
                 coin_obj.total_profit,
-                coin_obj.is_in_bought_Position,
                 coin_obj.buyed_price,
-                getattr(coin_obj, 'last_buy_time', "")
+                coin_obj.last_buy_time
             ))
             # שמור price_history
         for ts, price in coin_obj.med_price_history:
@@ -139,6 +136,7 @@ class SQL_DB_DashboardData:
                 INSERT OR IGNORE INTO okx_history (symbol, timestamp, price)
                 VALUES (?, ?, ?)
             """, (coin_obj.symbol, ts, price))
+        print(coin_obj.signal_state)
         conn.commit()
     
  
@@ -161,7 +159,6 @@ class SQL_DB_DashboardData:
             c.execute("SELECT timestamp, price FROM okx_history WHERE symbol=? ORDER BY timestamp DESC LIMIT ?", (symbol, history_limit))
             okx_history = c.fetchall()[::-1]
 
-
             result[symbol] = {
                 "symbol": symbol,
                 "med_price": stats[1] if stats else None,
@@ -175,76 +172,20 @@ class SQL_DB_DashboardData:
                 "buy_pressure": stats[9] if stats else None,
                 "sell_pressure": stats[10] if stats else None,
                 "position": stats[11] if stats else None,
-                "pnl_pct": stats[12] if stats else 0,
-                "total_buy_trades": stats[13] if stats else 0,
-                "total_sell_trades": stats[14] if stats else 0,
-                "total_profit": stats[15] if stats else 0,
+                "total_buy_trades": stats[12] if stats else 0,
+                "total_sell_trades": stats[13] if stats else 0,
+                "total_profit": stats[14] if stats else 0,
+                "buyed_price": stats[15] if stats else 0.0,
+                "last_buy_time": stats[16] if stats else "",
                 "price_history": price_history,
                 "binance_history": binance_history,
                 "bybit_history": bybit_history,
                 "okx_history": okx_history,
-                "is_in_bought_Position": stats[16] if stats else False,
-                "buyed_price": stats[17] if stats else 0.0,
-                "last_buy_time": stats[18] if stats else "",
             }
         conn.close()
         return result
 
-    @staticmethod
-    def restore_all_data(ALL_Coins):
-        """
-        טוען את כל הנתונים עבור רשימת מטבעות.
-        """
-        initialize_dashboard_db()
-        conn = sqlite3.connect(Config.DB_NAME)
-        c = conn.cursor()
-
-        for coin_obj in ALL_Coins.Coins:
-            if coin_obj.symbol not in Config.SYMBOLS:
-                print(f"Skipping {coin_obj.symbol} as it is not in Config.SYMBOLS")
-                continue
-            c.execute("SELECT * FROM stats WHERE symbol=?", (coin_obj.symbol,))
-            data= SQL_DB_DashboardData.load_all_data()
-
-            if not data or any(coin.symbol not in data for coin in ALL_Coins.Coins):
-                    for coin in ALL_Coins.Coins:
-                        data[coin.symbol] = {
-                            "symbol": coin.symbol,
-                            "binance_price": 0.0,
-                            "momentum": 0.0,
-                            "buy_pressure": 0.0,
-                            "sell_pressure": 0.0,
-                            "signal":  "error loading data",
-                            "position": "[💰_IN_@]" if coin.is_in_bought_Position else "[⏳_OUT_@]",
-                            "pnl_pct": coin.current_profit if coin.is_in_bought_Position else 0.0,
-                            "total_buy_trades": coin.total_buy_trades,
-                            "total_sell_trades": coin.total_sell_trades,
-                            "total_profit": coin.total_profit,
-                            "trades": coin.trade_manager.trade_log if coin.trade_manager else []}
-                        print(f"collect data: {coin.symbol} - error loading data")
-            else:
-                for coin in ALL_Coins.Coins:
-                    if len(coin.med_price_history)<Config.HISTORY_LIMIT:
-                        progress = f"{(len(coin.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}%"
-                        data[coin.symbol]["signal"] = progress
-                coin_obj.med_price = data[coin_obj.symbol]["med_price"]
-                coin_obj.binance_price = data[coin_obj.symbol]["binance_price"]
-                coin_obj.bybit_price = data[coin_obj.symbol]["bybit_price"]
-                coin_obj.okx_price = data[coin_obj.symbol]["okx_price"]
-                coin_obj.signal = data[coin_obj.symbol]["signal"]
-                coin_obj.last_time_str = data[coin_obj.symbol]["last_time_str"]
-                coin_obj.current_profit = data[coin_obj.symbol]["current_profit"]
-                coin_obj.total_buy_trades = data[coin_obj.symbol]["total_buy_trades"]
-                coin_obj.total_sell_trades = data[coin_obj.symbol]["total_sell_trades"]
-                coin_obj.total_profit = data[coin_obj.symbol]["total_profit"]
-                from collections import deque
-                coin_obj.med_price_history = deque(data[coin_obj.symbol]["price_history"], maxlen=Config.HISTORY_LIMIT)
-                coin_obj.binance_history = deque(data[coin_obj.symbol]["binance_history"], maxlen=Config.HISTORY_LIMIT)
-                coin_obj.bybit_history = deque(data[coin_obj.symbol]["bybit_history"], maxlen=Config.HISTORY_LIMIT)
-                coin_obj.okx_history = deque(data[coin_obj.symbol]["okx_history"], maxlen=Config.HISTORY_LIMIT)
-                coin_obj.is_in_bought_Position = data[coin_obj.symbol]["is_in_bought_Position"]   
-                coin_obj.buyed_price = data[coin_obj.symbol]["buyed_price"]
-                coin_obj.last_buy_time = data[coin_obj.symbol]["last_buy_time"]
+   
                 
     @staticmethod
     def record_trade(coin,action,reason=None):
@@ -276,10 +217,6 @@ class SQL_DB_DashboardData:
 
    
 
-    @staticmethod
-    def print_exchange_error(exchange_name: str, error_message: str):
-        timestamp = datetime.now(ZoneInfo("Asia/Jerusalem")).strftime("%Y-%m-%d %H:%M:%S")
-        print(f"[{timestamp}] {exchange_name.upper()} ERROR: {error_message}")
 
     @staticmethod
     def reset_trades_sqlite():
