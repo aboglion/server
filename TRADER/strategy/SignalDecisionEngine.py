@@ -102,7 +102,7 @@ class SignalDecisionEngine:
             (self.pressure_score * 0.5) +
             (self.signal_momentum * 0.3) +
             (self.volume_momentum * 0.2)
-        )
+        )*10
 
         # --- Dynamic Threshold ---
         volatility_adjustment = min(self.volatility * 5, 0.2)
