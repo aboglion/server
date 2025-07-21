@@ -86,14 +86,14 @@ def live_data():
     for coin in ALL_Coins.Coins:
         # if collecting data, we show progress
         if len(coin.med_price_history) < Config.HISTORY_LIMIT:
-            progress = f"{(len(coin.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}"
-            result[coin.symbol]["signal"] = progress+ "%"
+            progress = f"{int((len(coin.med_price_history)/Config.HISTORY_LIMIT)*100)}%"
+            result[coin.symbol]["signal"] = progress
             result[coin.symbol]["position"] = "..collecting data"
             result[coin.symbol]["pnl_pct"] = None
             result[coin.symbol]["total_buy_trades"] = None 
             result[coin.symbol]["total_sell_trades"] = None
             result[coin.symbol]["total_profit"] = None
-            result[coin.symbol]["binance_price"] = None
+            result[coin.symbol]["binance_price"] = 0
 
     return (jsonify({"data": result, "cycle_interval": Config.CYCLE_INTERVAL}), 200)
 
