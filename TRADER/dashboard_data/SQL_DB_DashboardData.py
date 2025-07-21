@@ -58,7 +58,6 @@ def initialize_dashboard_db():
             buy_pressure REAL,
             sell_pressure REAL,
             position TEXT,
-            pnl_pct REAL,
             total_buy_trades INTEGER,
             total_sell_trades INTEGER,
             total_profit REAL,
@@ -83,61 +82,71 @@ class SQL_DB_DashboardData:
             print(f"Database {Config.DB_NAME} does not exist. Initializing...")
             initialize_dashboard_db()
             os.chmod(Config.DB_NAME, 0o664)
+
         conn = sqlite3.connect(Config.DB_NAME)
         c = conn.cursor()
 
-
-            # שמור סטטיסטיקות
+        # שמור סטטיסטיקות
         c.execute("""
-                INSERT OR REPLACE INTO stats (
-                    symbol, med_price, binance_price, bybit_price, okx_price, signal, last_time_str, current_profit,
-                    momentum, buy_pressure, sell_pressure, position, pnl_pct, total_buy_trades, total_sell_trades, total_profit, buyed_price,last_buy_time
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                coin_obj.symbol,
-                coin_obj.med_price,
-                coin_obj.binance_price,
-                coin_obj.bybit_price,
-                coin_obj.okx_price,
-                coin_obj.signal,
-                coin_obj.last_time_str,
-                coin_obj.current_profit,
-                coin_obj.signal_state.momentum,
-                coin_obj.signal_state.buy_pressure,
-                coin_obj.signal_state.sell_pressure,
-                "[💰.IN]" if coin_obj.is_in_bought_Position else "[⏳.OUT]",
-                coin_obj.total_buy_trades,
-                coin_obj.total_sell_trades,
-                coin_obj.total_profit,
-                coin_obj.buyed_price,
-                coin_obj.last_buy_time
-            ))
-            # שמור price_history
+            INSERT OR REPLACE INTO stats (
+                symbol, med_price, binance_price, bybit_price, okx_price,
+                signal, last_time_str, current_profit, momentum,
+                buy_pressure, sell_pressure, position,
+                total_buy_trades, total_sell_trades, total_profit,
+                buyed_price, last_buy_time
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            coin_obj.symbol,
+            coin_obj.med_price,
+            coin_obj.binance_price,
+            coin_obj.bybit_price,
+            coin_obj.okx_price,
+            coin_obj.signal,
+            coin_obj.last_time_str,
+            coin_obj.current_profit,
+            coin_obj.signal_state.momentum,
+            coin_obj.signal_state.buy_pressure,
+            coin_obj.signal_state.sell_pressure,
+            "[💰.IN]" if coin_obj.is_in_bought_Position else "[⏳.OUT]",
+            coin_obj.total_buy_trades,
+            coin_obj.total_sell_trades,
+            coin_obj.total_profit,
+            coin_obj.buyed_price,
+            coin_obj.last_buy_time
+        ))
+
+        # price history
         for ts, price in coin_obj.med_price_history:
             c.execute("""
                 INSERT OR IGNORE INTO price_history (symbol, timestamp, price)
                 VALUES (?, ?, ?)
             """, (coin_obj.symbol, ts, price))
-        # שמור binance_history
+
+        # binance
         for ts, price in coin_obj.binance_history:
             c.execute("""
                 INSERT OR IGNORE INTO binance_history (symbol, timestamp, price)
                 VALUES (?, ?, ?)
             """, (coin_obj.symbol, ts, price))
-        # שמור bybit_history
+
+        # bybit
         for ts, price in coin_obj.bybit_history:
             c.execute("""
                 INSERT OR IGNORE INTO bybit_history (symbol, timestamp, price)
                 VALUES (?, ?, ?)
             """, (coin_obj.symbol, ts, price))
-        # שמור okx_history
+
+        # okx
         for ts, price in coin_obj.okx_history:
             c.execute("""
                 INSERT OR IGNORE INTO okx_history (symbol, timestamp, price)
                 VALUES (?, ?, ?)
             """, (coin_obj.symbol, ts, price))
+
         print(coin_obj.signal_state)
         conn.commit()
+        conn.close()
+
     
  
 
@@ -147,16 +156,33 @@ class SQL_DB_DashboardData:
         conn = sqlite3.connect(Config.DB_NAME)
         c = conn.cursor()
         result = {}
+
         for symbol in symbols:
             c.execute("SELECT * FROM stats WHERE symbol=?", (symbol,))
             stats = c.fetchone()
-            c.execute("SELECT timestamp, price FROM price_history WHERE symbol=? ORDER BY timestamp DESC LIMIT ?", (symbol, history_limit))
+
+            c.execute("""
+                SELECT timestamp, price FROM price_history
+                WHERE symbol=? ORDER BY timestamp DESC LIMIT ?
+            """, (symbol, history_limit))
             price_history = c.fetchall()[::-1]
-            c.execute("SELECT timestamp, price FROM binance_history WHERE symbol=? ORDER BY timestamp DESC LIMIT ?", (symbol, history_limit))
+
+            c.execute("""
+                SELECT timestamp, price FROM binance_history
+                WHERE symbol=? ORDER BY timestamp DESC LIMIT ?
+            """, (symbol, history_limit))
             binance_history = c.fetchall()[::-1]
-            c.execute("SELECT timestamp, price FROM bybit_history WHERE symbol=? ORDER BY timestamp DESC LIMIT ?", (symbol, history_limit))
+
+            c.execute("""
+                SELECT timestamp, price FROM bybit_history
+                WHERE symbol=? ORDER BY timestamp DESC LIMIT ?
+            """, (symbol, history_limit))
             bybit_history = c.fetchall()[::-1]
-            c.execute("SELECT timestamp, price FROM okx_history WHERE symbol=? ORDER BY timestamp DESC LIMIT ?", (symbol, history_limit))
+
+            c.execute("""
+                SELECT timestamp, price FROM okx_history
+                WHERE symbol=? ORDER BY timestamp DESC LIMIT ?
+            """, (symbol, history_limit))
             okx_history = c.fetchall()[::-1]
 
             result[symbol] = {
@@ -174,16 +200,19 @@ class SQL_DB_DashboardData:
                 "position": stats[11] if stats else None,
                 "total_buy_trades": stats[12] if stats else 0,
                 "total_sell_trades": stats[13] if stats else 0,
-                "total_profit": stats[14] if stats else 0,
+                "total_profit": stats[14] if stats else 0.0,
                 "buyed_price": stats[15] if stats else 0.0,
                 "last_buy_time": stats[16] if stats else "",
+
                 "price_history": price_history,
                 "binance_history": binance_history,
                 "bybit_history": bybit_history,
                 "okx_history": okx_history,
             }
+
         conn.close()
         return result
+
 
    
                 
@@ -198,8 +227,7 @@ class SQL_DB_DashboardData:
             (coin.symbol, action, coin.binance_price, coin.last_time_str, reason, coin.signal, coin.current_profit if action.lower() == "sell" else None)
         )
         conn.commit()
-        # Log progress after recording a trade
-        print(f"Trade recorded: {action} {coin.symbol} at {coin.binance_price} on {coin.last_time_str} | net_profit={net_profit}")
+
         conn.close()
 
     

@@ -407,9 +407,9 @@ function updateTable(results) {
       signalCell.className = m.signal ? `signal-${m.signal.toLowerCase()}` : '';
       row.cells[6].textContent = m.position || '';
       const pnlCell = row.cells[7];
-      pnlCell.textContent = (typeof m.pnl_pct === 'number') ? `${m.pnl_pct.toFixed(4)}%` : '';
+      pnlCell.textContent = (typeof m.current_profit === 'number') ? `${m.current_profit.toFixed(4)}%` : '';
       pnlCell.className = ''; // Clear previous classes
-      const pnlClass = m.pnl_pct > 0 ? 'positive-pnl' : m.pnl_pct < 0 ? 'negative-pnl' : null;
+      const pnlClass = m.current_profit > 0 ? 'positive-pnl' : m.current_profit < 0 ? 'negative-pnl' : null;
       if (pnlClass) pnlCell.classList.add(pnlClass);
       row.cells[8].textContent = m.total_buy_trades ?? '';
       row.cells[9].textContent = m.total_sell_trades ?? '';
@@ -443,8 +443,8 @@ function updateTable(results) {
       if (m.signal) signalCell.className = `signal-${m.signal.toLowerCase()}`;
       row.insertCell().textContent = m.position || '';
       const pnlCell = row.insertCell();
-      pnlCell.textContent = (typeof m.pnl_pct === 'number') ? `${m.pnl_pct.toFixed(4)}%` : '';
-      const pnlClass = m.pnl_pct > 0 ? 'positive-pnl' : m.pnl_pct < 0 ? 'negative-pnl' : null;
+      pnlCell.textContent = (typeof m.current_profit === 'number') ? `${m.current_profit.toFixed(4)}%` : '';
+      const pnlClass = m.current_profit > 0 ? 'positive-pnl' : m.current_profit < 0 ? 'negative-pnl' : null;
       if (pnlClass) pnlCell.classList.add(pnlClass);
       row.insertCell().textContent = m.total_buy_trades ?? '';
       row.insertCell().textContent = m.total_sell_trades ?? '';
