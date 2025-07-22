@@ -62,7 +62,7 @@ class MarketStatsCalculator:
         return (ob["bids"][0][0] + ob["asks"][0][0]) / 2
 
     def calculate_volatility(self):
-        avg_price = statistics.average([
+        avg_price = statistics.mean([
             self.binance_price(),
             self.bybit_price(),
             self.okx_price()
