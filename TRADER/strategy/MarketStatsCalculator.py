@@ -62,12 +62,13 @@ class MarketStatsCalculator:
         return (ob["bids"][0][0] + ob["asks"][0][0]) / 2
 
     def calculate_volatility(self):
-        prices = [p[1] for p in list(self.coin.med_price_history)]
-        returns = [math.log(p2 / p1) for p1, p2 in zip(prices, prices[1:]) if p1 > 0 and p2 > 0]
-        if not returns: return 0.0
-        mean = sum(returns) / len(returns)
-        variance = sum((r - mean) ** 2 for r in returns) / len(returns)
-        return math.sqrt(variance)
+        avg_price = statistics.average([
+            self.binance_price(),
+            self.bybit_price(),
+            self.okx_price()
+        ])
+        return abs(avg_price - self.calculate_med_price() )
+         
 
     def calculate_pressure_ratios(self):
         buy, sell = [], []
