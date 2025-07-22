@@ -44,9 +44,8 @@ class Config:
     # Stop Loss percentage. A 0.8% max loss from the entry price.
     STOP_LOSS_PCT = 0.008 # 0.8%
     # Minimum required Risk/Reward ratio to enter a trade.
-    # Example: 1.5 means for every $1 of risk, we expect at least $1.5 of profit.
-    # This is a key filter to avoid bad trades.
-    MIN_RISK_REWARD_RATIO = 1.5
+    # 0.25 means the potential profit must be at least 4 times the potential loss.
+    MIN_RISK_REWARD_RATIO = 0.25  # 0.25 = 1:4הפסד ratio
 
     # -- System and Database --
     DB_NAME = os.path.join(os.path.dirname(__file__), "dashboard_data", "DashboardData.db")
