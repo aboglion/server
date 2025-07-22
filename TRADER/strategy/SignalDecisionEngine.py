@@ -39,7 +39,9 @@ class SignalDecisionEngine:
         self.recent_sell_pressure.append(sell_p)
         self.recent_volumes.append(volume)
         if self.coin.is_in_bought_Position and self.coin.buyed_price > 0:
-            self.coin.current_profit = (self.coin.binance_price - self.coin.buyed_price) / self.coin.buyed_price
+            gross_profit = (self.coin.binance_price - self.coin.buyed_price) / self.coin.buyed_price
+            fee = Config.FEE * 2  # buy + sell
+            self.coin.current_profit = gross_profit - fee
         else:
             self.coin.current_profit = 0.0
         return True
