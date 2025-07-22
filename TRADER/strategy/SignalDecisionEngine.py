@@ -103,6 +103,11 @@ class SignalDecisionEngine:
         now = now or time.time()
         if not self._update_market_data(now):
             return SignalType.NEUTRAL
+                # --- Debug prints for deque lengths ---
+        print(f"med_price_history length: {len(self.coin.med_price_history)} (min: {Config.VOLATILITY_WINDOW})")
+        print(f"recent_buy_pressure length: {len(self.recent_buy_pressure)} (min: {Config.PRESSURE_WINDOW})")
+        print(f"recent_volumes length: {len(self.recent_volumes)} (min: {Config.VOLUME_WINDOW})")
+
         if (len(self.coin.med_price_history) < Config.VOLATILITY_WINDOW or
             len(self.recent_buy_pressure) < Config.PRESSURE_WINDOW or
             len(self.recent_volumes) < Config.VOLUME_WINDOW):
