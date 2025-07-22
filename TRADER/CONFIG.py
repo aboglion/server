@@ -27,7 +27,7 @@ class Config:
     VOLATILITY_WINDOW = int(HISTORY_LIMIT / 1.5)
 
     # -- Trade Decision Thresholds --
-    BASE_DECISION_THRESHOLD = 2  #momentum threshold for trade decisions
+    BASE_DECISION_THRESHOLD = 2.7  #momentum threshold for trade decisions
     
     # -- Risk Management Parameters (UPDATED) --
     FEE = 0.001                     # 0.1% fee per trade
