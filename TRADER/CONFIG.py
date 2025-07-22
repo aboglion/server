@@ -36,8 +36,8 @@ class Config:
     MIN_RISK_REWARD_RATIO = 1.0     # ✅ סף מינימלי של 1:1 ליחס סיכון-סיכוי
 
     # -- Volatility Filter for Scalping (NEW) --
-    MIN_VOLATILITY_FOR_SCALPING = 0.002  # 📉 לא לסחור אם התנודתיות נמוכה מ-0.2%
-    MAX_VOLATILITY_FOR_SCALPING = 0.015  # 📈 לא לסחור אם התנודתיות גבוהה מ-1.5%
+    MIN_VOLATILITY_FOR_SCALPING = 0.0001  # 📉 לא לסחור אם התנודתיות נמוכה-0.
+    MAX_VOLATILITY_FOR_SCALPING = 2  # 📈 לא לסחור אם התנודתיות גבוההמ-
 
     # -- System and Database --
     DB_NAME = os.path.join(os.path.dirname(__file__), "dashboard_data", "DashboardData.db")
