@@ -113,8 +113,11 @@ class SignalDecisionEngine:
                 return SignalType.NEUTRAL
 
             risk_reward_ratio = net_potential_profit / potential_loss
+            
             if risk_reward_ratio < Config.MIN_RISK_REWARD_RATIO:
                 return SignalType.NEUTRAL
+            else:
+                print(f"{self.coin.symbol}->{risk_reward_ratio:.2f},signal")
 
         return signal
 
