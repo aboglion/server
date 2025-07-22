@@ -31,9 +31,9 @@ class Config:
     
     # -- Risk Management Parameters (UPDATED) --
     FEE = 0.001                     # 0.1% fee per trade
-    
-    TAKE_PROFIT_PCT = 0.012         # ✅ יעד רווח של 1.2%
-    STOP_LOSS_PCT = 0.010           # ✅ סטופ-לוס הורחב ל-1.0% למניעת יציאה מוקדמת
+
+    TAKE_PROFIT_PCT = 0.005         # ✅ יעד רווח של 1.2%
+    STOP_LOSS_PCT = 0.017           # ✅ סטופ-לוס הורחב ל-1.0% למניעת יציאה מוקדמת
     MIN_RISK_REWARD_RATIO = 1.0     # ✅ סף מינימלי של 1:1 ליחס סיכון-סיכוי
 
     # -- Volatility Filter for Scalping (NEW) --
