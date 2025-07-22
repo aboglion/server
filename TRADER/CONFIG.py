@@ -16,42 +16,33 @@ class Config:
     SYMBOLS = ["BTCUSDT", "ETHUSDT", "XRPUSDT", "SOLUSDT"]
 
     # -- Timing and Data History --
-    CYCLE_INTERVAL = 10  # Interval in seconds for processing coins.
-    HISTORY_LIMIT = int((15 * 60) / CYCLE_INTERVAL)  # Data retention for 15 minutes.
+    CYCLE_INTERVAL = 10
+    HISTORY_LIMIT = int((15 * 60) / CYCLE_INTERVAL)
     
     # -- Technical Indicator Windows --
-    # Shorter window for recent, fast-changing momentum
-    MOMENTUM_WINDOW =min(15,HISTORY_LIMIT)  
-    # Medium window for pressure calculation, to get a stable trend
-    PRESSURE_WINDOW = min(30, HISTORY_LIMIT)  # 30 seconds
-    # Longer window for long-term momentum, to capture broader trends
+    MOMENTUM_WINDOW = min(15, HISTORY_LIMIT)  
+    PRESSURE_WINDOW = min(30, HISTORY_LIMIT)
     MOMENTUM_WINDOW_LONG = 30
-    # Longer window for volume trend, to identify significant market activity shifts
     VOLUME_WINDOW = 60
-    # Window for volatility calculation, based on historical price changes
     VOLATILITY_WINDOW = int(HISTORY_LIMIT / 1.5)
 
     # -- Trade Decision Thresholds --
-    # The base score required to trigger a signal. Range: 0 to 1.
-    # Higher value means the bot is more "picky" and waits for stronger signals.
     BASE_DECISION_THRESHOLD = 2
     
-    # -- Risk Management Parameters (CRITICAL) --
-    # The fee per trade (buy or sell). 0.1% = 0.001
-    FEE = 0.001 
-    # Take Profit percentage. A 1.2% target profit from the entry price.
-    TAKE_PROFIT_PCT = 0.012 # 1.2%
-    # Stop Loss percentage. A 0.8% max loss from the entry price.
-    STOP_LOSS_PCT = 0.008 # 0.8%
-    # Minimum required Risk/Reward ratio to enter a trade.
-    # 0.25 means the potential profit must be at least 4 times the potential loss.
-    MIN_RISK_REWARD_RATIO = 0.25  # 0.25 = 1:4הפסד ratio
+    # -- Risk Management Parameters (UPDATED) --
+    FEE = 0.001                     # 0.1% fee per trade
+    TAKE_PROFIT_PCT = 0.012         # ✅ יעד רווח של 1.2%
+    STOP_LOSS_PCT = 0.010           # ✅ סטופ-לוס הורחב ל-1.0% למניעת יציאה מוקדמת
+    MIN_RISK_REWARD_RATIO = 1.0     # ✅ סף מינימלי של 1:1 ליחס סיכון-סיכוי
+
+    # -- Volatility Filter for Scalping (NEW) --
+    MIN_VOLATILITY_FOR_SCALPING = 0.002  # 📉 לא לסחור אם התנודתיות נמוכה מ-0.2%
+    MAX_VOLATILITY_FOR_SCALPING = 0.015  # 📈 לא לסחור אם התנודתיות גבוהה מ-1.5%
 
     # -- System and Database --
     DB_NAME = os.path.join(os.path.dirname(__file__), "dashboard_data", "DashboardData.db")
     PORT = 7070
     DEBUG = True
-
 
 # =====================================================
 # Signal Types Enum
