@@ -27,17 +27,18 @@ class Config:
     VOLATILITY_WINDOW = int(HISTORY_LIMIT / 1.5)
 
     # -- Trade Decision Thresholds --
-    BASE_DECISION_THRESHOLD = 2
+    BASE_DECISION_THRESHOLD = 2  #momentum threshold for trade decisions
     
     # -- Risk Management Parameters (UPDATED) --
     FEE = 0.001                     # 0.1% fee per trade
+    
     TAKE_PROFIT_PCT = 0.012         # ✅ יעד רווח של 1.2%
     STOP_LOSS_PCT = 0.010           # ✅ סטופ-לוס הורחב ל-1.0% למניעת יציאה מוקדמת
     MIN_RISK_REWARD_RATIO = 1.0     # ✅ סף מינימלי של 1:1 ליחס סיכון-סיכוי
 
     # -- Volatility Filter for Scalping (NEW) --
     MIN_VOLATILITY_FOR_SCALPING = 0.0001  # 📉 לא לסחור אם התנודתיות נמוכה-0.
-    MAX_VOLATILITY_FOR_SCALPING = 2  # 📈 לא לסחור אם התנודתיות גבוההמ-
+    MAX_VOLATILITY_FOR_SCALPING = 2  # 📈 לא לסחור אם התנודתיות גבוהה-2.
 
     # -- System and Database --
     DB_NAME = os.path.join(os.path.dirname(__file__), "dashboard_data", "DashboardData.db")
