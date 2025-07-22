@@ -143,7 +143,6 @@ class SQL_DB_DashboardData:
                 VALUES (?, ?, ?)
             """, (coin_obj.symbol, ts, price))
 
-        print(coin_obj.signal_state)
         conn.commit()
         conn.close()
 

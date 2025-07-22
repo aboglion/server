@@ -14,7 +14,7 @@ class SignalDecisionEngine:
     This revised engine uses a scoring system and robust risk management
     to make more reliable, conservative trading decisions.
     """
-    def __init__(self, coin,calc):
+    def __init__(self, coin, calc):
         self.coin = coin
         self.calc = calc
 
@@ -28,28 +28,25 @@ class SignalDecisionEngine:
         self.med_price = 0.0
         self.last_decision = SignalType.NEUTRAL
 
-        # --- Instance attributes for indicators (as requested) ---
+        # --- Instance attributes for indicators ---
         self.volatility = 0.0
         self.signal_momentum = 0.0
         self.pressure_score = 0.0
         self.volume_momentum = 0.0
-          # --- Pressure Analysis ---
-        self.buy_pressure = 0
-        self.sell_pressure = 0
+        self.buy_pressure = 0.0
+        self.sell_pressure = 0.0
         self.momentum = 0.0
 
     def _update_market_data(self, now):
-        """Fetches and updates the latest market prices and volumes."""
         self.med_price = self.calc.calculate_med_price()
-        
         if self.med_price <= 0:
             return False
 
         self.coin.med_price_history.append((now, self.med_price))
-        
+
         buy_p, sell_p = self.calc.calculate_pressure_ratios()
         volume = self.calc.calculate_Volume()
-        
+
         self.recent_buy_pressure.append(buy_p)
         self.recent_sell_pressure.append(sell_p)
         self.recent_volumes.append(volume)
@@ -58,17 +55,13 @@ class SignalDecisionEngine:
             self.coin.current_profit = (self.coin.binance_price - self.coin.buyed_price) / self.coin.buyed_price
         else:
             self.coin.current_profit = 0.0
-            
+
         return True
 
     def _calculate_indicators(self):
-        """
-        Calculates high-level indicators and stores them directly
-        as instance attributes. Returns False if there's not enough data.
-        """
         volumes_list = list(self.recent_volumes)
         if (len(volumes_list) // 2) < 2:
-            return False # Not enough data for volume momentum
+            return False  # Not enough data for volume momentum
 
         # --- Signal Momentum ---
         buy_signals = self.recent_signals.count(SignalType.BUY)
@@ -89,20 +82,16 @@ class SignalDecisionEngine:
 
         # --- Volatility ---
         self.volatility = self.calc.calculate_volatility()
-        
+
         return True
 
     def _make_decision(self):
-        """
-        Makes the final trade decision based on instance indicators and risk management.
-        No longer needs arguments as it uses 'self'.
-        """
-        # --- Weighted Trade Score ---
+        # --- Unified Momentum Calculation ---
         self.momentum = (
             (self.pressure_score * 0.5) +
             (self.signal_momentum * 0.3) +
             (self.volume_momentum * 0.2)
-        ) * 100
+        )*10
 
         # --- Dynamic Threshold ---
         volatility_adjustment = min(self.volatility * 5, 0.2)
@@ -114,58 +103,44 @@ class SignalDecisionEngine:
         elif self.momentum < -decision_threshold:
             signal = SignalType.SELL
 
-        # --- CRITICAL: Risk/Reward Filter ---
+        # --- Risk/Reward Filter ---
         if signal != SignalType.NEUTRAL:
             potential_profit = self.med_price * Config.TAKE_PROFIT_PCT
             potential_loss = self.med_price * Config.STOP_LOSS_PCT
             net_potential_profit = potential_profit - (self.med_price * Config.FEE * 2)
 
             if potential_loss == 0:
-                return SignalType.NEUTRAL 
+                return SignalType.NEUTRAL
 
             risk_reward_ratio = net_potential_profit / potential_loss
-            
             if risk_reward_ratio < Config.MIN_RISK_REWARD_RATIO:
                 return SignalType.NEUTRAL
-        
+
         return signal
 
     def analyze(self, now=None):
-        """
-        Main analysis loop. Executes the full process of data update,
-        indicator calculation, and decision making.
-        """
         now = now or time.time()
 
         if not self._update_market_data(now):
             return SignalType.NEUTRAL
 
-        # --- Check for sufficient data ---
         if (len(self.coin.med_price_history) < Config.VOLATILITY_WINDOW or
             len(self.recent_buy_pressure) < Config.PRESSURE_WINDOW or
             len(self.recent_volumes) < Config.VOLUME_WINDOW):
             return SignalType.NEUTRAL
 
-        # --- Calculate indicators and make a decision ---
         if not self._calculate_indicators():
             return SignalType.NEUTRAL
 
         final_signal = self._make_decision()
-        
-        # --- Update recent signals deque for next iteration's momentum ---
-        # Calculate raw signal based on current state to measure market sentiment
-        self.momentum = (
-            (self.pressure_score * 0.5) +
-            (self.signal_momentum * 0.3) +
-            (self.volume_momentum * 0.2)
-        )
-        
-        raw_signal = SignalType.NEUTRAL
-        if self.momentum > Config.BASE_DECISION_THRESHOLD:
-            raw_signal = SignalType.BUY
-        elif self.momentum < -Config.BASE_DECISION_THRESHOLD:
-            raw_signal = SignalType.SELL
-        self.recent_signals.append(raw_signal)
 
+        # --- Update recent_signals with raw market sentiment ---
+        unfiltered_signal = SignalType.NEUTRAL
+        if self.momentum > Config.BASE_DECISION_THRESHOLD:
+            unfiltered_signal = SignalType.BUY
+        elif self.momentum < -Config.BASE_DECISION_THRESHOLD:
+            unfiltered_signal = SignalType.SELL
+
+        self.recent_signals.append(unfiltered_signal)
         self.last_decision = final_signal
-        return self.last_decision
+        return final_signal
