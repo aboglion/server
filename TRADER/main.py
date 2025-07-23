@@ -85,11 +85,11 @@ def live_data():
 
     for coin in ALL_Coins.Coins:
         # if collecting data, we show progress
-        if coin.signal.startswith("COLLECTING"):
+        if isinstance(coin.signal, str) and coin.signal.startswith("COLLECTING"):
             print("")
             result[coin.symbol]["position"] = None
             result[coin.symbol]["pnl_pct"] = None
-            result[coin.symbol]["total_buy_trades"] = None 
+            result[coin.symbol]["total_buy_trades"] = None
             result[coin.symbol]["total_sell_trades"] = None
             result[coin.symbol]["total_profit"] = None
             result[coin.symbol]["binance_price"] = 0
