@@ -111,11 +111,11 @@ class SignalDecisionEngine:
 
         COLLECTING_Progress = "COLLECTING 0%"
         if len(self.coin.med_price_history) < Config.HISTORY_LIMIT:
-            COLLECTING_Progress = f"COLLECTING stage0 {int(len(self.coin.med_price_history)/Config.HISTORY_LIMIT)*100}%"
+            COLLECTING_Progress = f"COLLECTING stage0 {int(len(self.coin.med_price_history)/Config.HISTORY_LIMIT*100)}%"
         else:
             max_len_collected = max(Config.HISTORY_LIMIT, Config.VOLATILITY_WINDOW, Config.PRESSURE_WINDOW, Config.VOLUME_WINDOW)
             min_pv = min(len(self.recent_signals), len(self.recent_buy_pressure), len(self.recent_sell_pressure), len(self.recent_volumes))
-            COLLECTING_Progress=f"COLLECTING {int(min_pv/max_len_collected)*100:.3f}%"
+            COLLECTING_Progress=f"COLLECTING {(min_pv/max_len_collected)*100:.2f}%"
 
     
         if (len(self.coin.med_price_history) < max(Config.VOLATILITY_WINDOW,Config.HISTORY_LIMIT) or
