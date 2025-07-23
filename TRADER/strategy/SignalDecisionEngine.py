@@ -118,8 +118,8 @@ class SignalDecisionEngine:
             len(self.recent_buy_pressure) < Config.PRESSURE_WINDOW or
             len(self.recent_sell_pressure) < Config.PRESSURE_WINDOW or
             len(self.recent_volumes) < Config.VOLUME_WINDOW) :
-                 COLLECTING_Progress=(f"{stage}  {int(min_pv/max_len_collected)*100}% | {self.coin.symbol}")
-                 print(COLLECTING_Progress)
+                 COLLECTING_Progress=(f"{stage}  {int(min_pv/max_len_collected)*100}%")
+                 print(COLLECTING_Progress,"|",self.coin.symbol)
                  return COLLECTING_Progress
 
         # --- Market Data Checks ---
