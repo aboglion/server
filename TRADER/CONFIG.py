@@ -45,13 +45,3 @@ class Config:
     PORT = 7070
     DEBUG = True
 
-# =====================================================
-# Signal Types Enum
-# =====================================================
-class SignalType(Enum):
-    """
-    Represents the possible trading signals.
-    """
-    BUY = "BUY"
-    SELL = "SELL"
-    NEUTRAL = "NEUTRAL"

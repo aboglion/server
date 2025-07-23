@@ -93,8 +93,7 @@ def live_data():
             result[coin.symbol]["total_sell_trades"] = None
             result[coin.symbol]["total_profit"] = None
             result[coin.symbol]["binance_price"] = 0
-        else:
-            result[coin.symbol]["signal"] = coin.signal.name if coin.signal else "NO_SIGNAL"
+        
 
 
 

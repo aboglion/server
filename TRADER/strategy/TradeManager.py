@@ -1,4 +1,4 @@
-from CONFIG import Config, SignalType
+from CONFIG import Config
 from dashboard_data.SQL_DB_DashboardData import SQL_DB_DashboardData
 
 import os
@@ -41,7 +41,7 @@ class TradeManager:
 
 #>>#--------------| Buy cond |-------------------------
         # Require at least 2 out of 3 exchanges to show an increase
-        if (self.coin.signal == SignalType.BUY.name and
+        if (self.coin.signal == "BUY" and
             not self.coin.is_in_bought_Position and
             price_increases >= 2):
                 print(f"[{self.coin.symbol}] Buy conditions met: Signal={self.coin.signal}, Not in position, Price Increases={price_increases}")
@@ -83,15 +83,15 @@ class TradeManager:
             # print(f"[{self.coin.symbol}] Not checking sell conditions: Not in bought position or buyed price is zero.")
             return False
         
-        if self.coin.current_profit >= Config.TAKE_PROFIT_PCT and self.coin.signal != SignalType.BUY.name:
+        if self.coin.current_profit >= Config.TAKE_PROFIT_PCT and self.coin.signal != "BUY":
             print(f"[{self.coin.symbol}] Take Profit condition met.")
             return self.execute_sell("💰 TAKE_profit")
         
-        if self.coin.signal == SignalType.SELL.name and self.coin.current_profit >= 0 :
+        if self.coin.signal == "SELL" and self.coin.current_profit >= 0 :
             print(f"[{self.coin.symbol}] Sell Signal condition met.")
             return self.execute_sell("📉 SELL_SIGNAL")
 
-        if self.coin.current_profit <= -Config.STOP_LOSS_PCT and self.coin.signal == SignalType.SELL.name:
+        if self.coin.current_profit <= -Config.STOP_LOSS_PCT and self.coin.signal == "SELL":
             print(f"[{self.coin.symbol}] Stop Loss condition met.")
             return self.execute_sell("🛑 STOP_LOSS")
 
