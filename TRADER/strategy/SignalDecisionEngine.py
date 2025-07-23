@@ -108,13 +108,17 @@ class SignalDecisionEngine:
             return SignalType.NEUTRAL
                 # --- Debug prints for deque lengths ---
         max_len_collected = max(Config.HISTORY_LIMIT, Config.VOLATILITY_WINDOW, Config.PRESSURE_WINDOW, Config.VOLUME_WINDOW)
+        stage="COLLECTING stage1"
         min_pv = min(len(self.recent_signals), len(self.recent_buy_pressure), len(self.recent_sell_pressure), len(self.recent_volumes))
-        if min_pv==0: min_pv = len(self.coin.med_price_history)  # Avoid division by zero
+        if min_pv==0:
+            min_pv = len(self.coin.med_price_history) 
+        else:
+            stage="COLLECTING stage2"
         if (len(self.coin.med_price_history) < max(Config.VOLATILITY_WINDOW,Config.HISTORY_LIMIT) or
             len(self.recent_buy_pressure) < Config.PRESSURE_WINDOW or
             len(self.recent_sell_pressure) < Config.PRESSURE_WINDOW or
             len(self.recent_volumes) < Config.VOLUME_WINDOW) :
-                 COLLECTING_Progress=(f"COLLECTING {(min_pv/max_len_collected)*100}% | {self.coin.symbol}")
+                 COLLECTING_Progress=(f"{stage}  {int(min_pv/max_len_collected)*100}% | {self.coin.symbol}")
                  print(COLLECTING_Progress)
                  return COLLECTING_Progress
 
