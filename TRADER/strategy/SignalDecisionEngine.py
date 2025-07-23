@@ -88,17 +88,18 @@ class SignalDecisionEngine:
             signal = SignalType.SELL
 
         # --- Risk/Reward Filter ---
-        risk_reward_ratio = 0.0 if potential_loss == 0 else net_potential_profit / potential_loss
+        risk_reward_ratio,potential_profit,potential_loss = 0.0,0.0,0.0
         if signal != SignalType.NEUTRAL:
             potential_profit = self.med_price * Config.TAKE_PROFIT_PCT
             potential_loss = self.med_price * Config.STOP_LOSS_PCT
             net_potential_profit = potential_profit - (self.med_price * Config.FEE * 2)
             if potential_loss == 0:
                 return SignalType.NEUTRAL
+            risk_reward_ratio = net_potential_profit / potential_loss
             if risk_reward_ratio < Config.MIN_RISK_REWARD_RATIO:
                 return SignalType.NEUTRAL
             
-        print(f"{self.coin.symbol}->risk:{risk_reward_ratio:.4f},decision_threshold:{decision_threshold:.4f},signal:{signal}")
+        print(f"{self.coin.symbol}->risk:{risk_reward_ratio:.4f},decision_threshold:{decision_threshold:.4f},signal")
         return signal
 
     def analyze(self, now=None):
