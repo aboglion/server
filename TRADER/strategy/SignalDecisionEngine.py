@@ -106,19 +106,23 @@ class SignalDecisionEngine:
         now = now or time.time()
         if not self._update_market_data(now):
             return SignalType.NEUTRAL
+        
                 # --- Debug prints for deque lengths ---
-        max_len_collected = max(Config.HISTORY_LIMIT, Config.VOLATILITY_WINDOW, Config.PRESSURE_WINDOW, Config.VOLUME_WINDOW)
-        stage="COLLECTING stage1"
-        min_pv = min(len(self.recent_signals), len(self.recent_buy_pressure), len(self.recent_sell_pressure), len(self.recent_volumes))
-        if min_pv==0:
-            min_pv = len(self.coin.med_price_history) 
+
+        COLLECTING_Progress = "COLLECTING 0%"
+        if len(self.coin.med_price_history) < Config.HISTORY_LIMIT:
+            stage = f"COLLECTING stage0 {int(len(self.coin.med_price_history)/Config.HISTORY_LIMIT)*100}%"
         else:
-            stage="COLLECTING stage2"
+            max_len_collected = max(Config.HISTORY_LIMIT, Config.VOLATILITY_WINDOW, Config.PRESSURE_WINDOW, Config.VOLUME_WINDOW)
+            min_pv = min(len(self.recent_signals), len(self.recent_buy_pressure), len(self.recent_sell_pressure), len(self.recent_volumes))
+            stage=f"COLLECTING {int(min_pv/max_len_collected)*100:.3f}%"
+            COLLECTING_Progress = f"{stage} 0%"
+
+    
         if (len(self.coin.med_price_history) < max(Config.VOLATILITY_WINDOW,Config.HISTORY_LIMIT) or
             len(self.recent_buy_pressure) < Config.PRESSURE_WINDOW or
             len(self.recent_sell_pressure) < Config.PRESSURE_WINDOW or
             len(self.recent_volumes) < Config.VOLUME_WINDOW) :
-                 COLLECTING_Progress=(f"{stage}  {int(min_pv/max_len_collected)*100}%")
                  print(COLLECTING_Progress,"|",self.coin.symbol)
                  return COLLECTING_Progress
 
