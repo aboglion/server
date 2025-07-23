@@ -113,8 +113,9 @@ class SignalDecisionEngine:
             len(self.recent_buy_pressure) < Config.PRESSURE_WINDOW or
             len(self.recent_sell_pressure) < Config.PRESSURE_WINDOW or
             len(self.recent_volumes) < Config.VOLUME_WINDOW):
-                 print(f"----> collecting data progress: {(min_pv/max_len_collected)*100} % ")
-                 return SignalType.NEUTRAL
+                 COLLECTING_Progress=(f"COLLECTING {(min_pv/max_len_collected)*100}%")
+                 print(COLLECTING_Progress)
+                 return COLLECTING_Progress
 
         # --- Market Data Checks ---
         if not self._calculate_indicators():
