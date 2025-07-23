@@ -107,14 +107,16 @@ class SignalDecisionEngine:
         if not self._update_market_data(now):
             return SignalType.NEUTRAL
                 # --- Debug prints for deque lengths ---
-        print(f"med_price_history length: {len(self.coin.med_price_history)} (min: {Config.VOLATILITY_WINDOW})")
-        print(f"recent_buy_pressure length: {len(self.recent_buy_pressure)} (min: {Config.PRESSURE_WINDOW})")
-        print(f"recent_volumes length: {len(self.recent_volumes)} (min: {Config.VOLUME_WINDOW})")
-
+        max_len_collected = max(len(self.recent_signals), len(self.recent_buy_pressure), len(self.recent_sell_pressure), len(self.recent_volumes))
+        min_pv = min(len(self.recent_signals), len(self.recent_buy_pressure), len(self.recent_sell_pressure), len(self.recent_volumes))
         if (len(self.coin.med_price_history) < Config.VOLATILITY_WINDOW or
             len(self.recent_buy_pressure) < Config.PRESSURE_WINDOW or
+            len(self.recent_sell_pressure) < Config.PRESSURE_WINDOW or
             len(self.recent_volumes) < Config.VOLUME_WINDOW):
-            return SignalType.NEUTRAL
+                 print(f"----> collecting data progress: {(min_pv/max_len_collected)*100} % ")
+                 return SignalType.NEUTRAL
+
+        # --- Market Data Checks ---
         if not self._calculate_indicators():
             return SignalType.NEUTRAL
         final_signal = self._make_decision()
