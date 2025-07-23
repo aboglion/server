@@ -125,15 +125,11 @@ class Coin:
                 print(f"Coin.process_coin: Invalid okx_price for {self.symbol}: {okx_price}")
                 return
 
-            if len(self.med_price_history) < Config.HISTORY_LIMIT:
-                if self.symbol == Config.SYMBOLS[0]:
-                    progress = f"{(len(self.med_price_history)/Config.HISTORY_LIMIT)*100:.4f}%"
-                    self.signal= progress
-                    print(f"Progress collecting data {progress} ")
-                return
 
             signal=self.signal_state.analyze(now)
-            self.signal = signal.name if signal else "NO_SIGNAL"
+            if signal is None : signal = "NO_SIGNAL"
+            elif not signal.startswith("COLLECTING"):
+                self.prev_signal = signal
             if  self.prev_med_price != self.med_price :
                 self.trade_manager.check_selling_cond()
                 self.trade_manager.check_buying_cond()
