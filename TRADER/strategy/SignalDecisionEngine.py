@@ -67,7 +67,7 @@ class SignalDecisionEngine:
         # 💡 --- Volatility Filter (ADDED) ---
         # First, check if the market is suitable for trading.
         # If volatility is too high or too low, do not proceed.
-        print(f"Volatility: {self.volatility:.2f}")
+        # print(f"Volatility: {self.volatility:.2f}")
         if not (Config.MIN_VOLATILITY_FOR_SCALPING < self.volatility < Config.MAX_VOLATILITY_FOR_SCALPING):
             return "NEUTRAL"  # Skip trade if market conditions are not ideal
 
