@@ -101,7 +101,7 @@ class SQL_DB_DashboardData:
             coin_obj.binance_price,
             coin_obj.bybit_price,
             coin_obj.okx_price,
-            coin_obj.signal,
+            str(coin_obj.signal) if coin_obj.signal is not None else "None_SIGNAL",
             coin_obj.last_time_str,
             coin_obj.current_profit,
             float(coin_obj.signal_state.momentum) if coin_obj.signal_state.momentum is not None else 0.0,
