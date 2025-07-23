@@ -127,14 +127,15 @@ class Coin:
 
 
             _signal=self.signal_state.analyze(now)
+            print (self.med_price_history,_signal)
             if _signal is None : _signal = "NO_SIGNAL"
             elif not _signal.startswith("COLLECTING"):
                 self.prev_signal = "Natural"
                 self.signal = _signal
             if  self.prev_med_price != self.med_price :
-                self.trade_manager.check_selling_cond()
-                self.trade_manager.check_buying_cond()
-                SQL_DB_DashboardData.save_all_data(self)
+                    self.trade_manager.check_selling_cond()
+                    self.trade_manager.check_buying_cond()
+                    SQL_DB_DashboardData.save_all_data(self)
 
 
         
