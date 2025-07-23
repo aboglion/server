@@ -113,7 +113,7 @@ class SignalDecisionEngine:
             len(self.recent_buy_pressure) < Config.PRESSURE_WINDOW or
             len(self.recent_sell_pressure) < Config.PRESSURE_WINDOW or
             len(self.recent_volumes) < Config.VOLUME_WINDOW) :
-                 COLLECTING_Progress=(f"COLLECTING {(min_pv/max_len_collected)*100}%")
+                 COLLECTING_Progress=(f"COLLECTING {(min_pv/max_len_collected)*100}% {min_pv}/{max_len_collected} ")
                  print(COLLECTING_Progress)
                  return COLLECTING_Progress
 
