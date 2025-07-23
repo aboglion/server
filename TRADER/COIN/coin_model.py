@@ -129,7 +129,7 @@ class Coin:
             _signal=self.signal_state.analyze(now)
             if _signal is None:
                 _signal = "NO_SIGNAL"
-            elif isinstance(_signal, str) and not _signal.startswith("COLLECTING"):
+            elif _signal.startswith("COLLECTING"):
                 self.signal = _signal
                 return
             self.prev_signal = self.signal

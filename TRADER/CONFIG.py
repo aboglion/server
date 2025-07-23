@@ -24,7 +24,7 @@ class Config:
     PRESSURE_WINDOW = min(30, HISTORY_LIMIT)
     MOMENTUM_WINDOW_LONG = 30
     VOLUME_WINDOW = 60
-    VOLATILITY_WINDOW = int(HISTORY_LIMIT / 1.5)
+    # VOLATILITY_WINDOW = int(HISTORY_LIMIT / 1.5)
 
     # -- Trade Decision Thresholds --
     BASE_DECISION_THRESHOLD = 2.7  #momentum threshold for trade decisions
