@@ -99,7 +99,6 @@ class SignalDecisionEngine:
             if risk_reward_ratio < Config.MIN_RISK_REWARD_RATIO:
                 return SignalType.NEUTRAL
             
-        print(f"{self.coin.symbol}->risk:{risk_reward_ratio:.4f},decision_threshold:{decision_threshold:.4f},signal")
         return signal
 
     def analyze(self, now=None):
