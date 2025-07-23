@@ -126,10 +126,11 @@ class Coin:
                 return
 
 
-            signal=self.signal_state.analyze(now)
-            if signal is None : signal = "NO_SIGNAL"
-            elif not signal.startswith("COLLECTING"):
-                self.prev_signal = signal
+            _signal=self.signal_state.analyze(now)
+            if _signal is None : _signal = "NO_SIGNAL"
+            elif not _signal.startswith("COLLECTING"):
+                self.prev_signal = "Natural"
+                self.signal = _signal
             if  self.prev_med_price != self.med_price :
                 self.trade_manager.check_selling_cond()
                 self.trade_manager.check_buying_cond()
