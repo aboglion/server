@@ -1,0 +1,4 @@
+aboglion.top {
+    reverse_proxy n8n:5678
+    tls aboglion@gmail.com
+}

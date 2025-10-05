@@ -1,39 +1,39 @@
+version: "3.8"
+
+networks:
+  app_net:
+    driver: bridge
+
 services:
-  person_detection_api:
-    image: public.ecr.aws/g7a8t7v6/inference-container:f4270a3f7c464e66c2879b885d6bbb40c7fc3e5f
-    ports:
-      - "3000:3000"
-    command:
-      [
-        "--api-key", "ei_9fdc7ce93bd1d4fa9dbd33d7551d64bae4434c65b4b875f42dec41c641693dd1",
-        "--run-http-server", "3000",
-        "--impulse-id", "2",
-        "--force-variant", "float32"
-      ]
-    restart: unless-stopped
-
-
   n8n:
     image: n8nio/n8n:latest
+    container_name: n8n
     restart: unless-stopped
-    ports:
-      - "8743:5678"
     environment:
       - N8N_HOST=aboglion.top
       - N8N_PORT=5678
       - N8N_PROTOCOL=https
-      - WEBHOOK_URL=https://aboglion.top:8743/
+      - N8N_EDITOR_BASE_URL=https://aboglion.top:8744/
+      - WEBHOOK_TUNNEL_URL=https://aboglion.top:8744/
       - NODE_ENV=production
       - GENERIC_TIMEZONE=Asia/Jerusalem
-      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
-      - N8N_SSL_KEY=/home/node/.n8n/ssl/privkey.pem
-      - N8N_SSL_CERT=/home/node/.n8n/ssl/fullchain.pem
-      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
       - NODE_FUNCTION_ALLOW_EXTERNAL=*
-
-
+      - N8N_USER_FOLDER=/home/node/.n8n
     volumes:
-      - ./n8n:/home/node/.n8n
+      - ../data_backup/n8n_data:/home/node/.n8n
+    networks:
+      - app_net
 
-
-
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "8744:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy/ssl:/etc/caddy/ssl:ro
+    depends_on:
+      - n8n
+    networks:
+      - app_net
