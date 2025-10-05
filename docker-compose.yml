@@ -62,13 +62,13 @@ services:
           memory: 128M
 
   searxng:
-    image: searxng/searxng:latest
+    image: searxng/searxng:2025.10.1-06e4f4f75
     container_name: searxng
     restart: unless-stopped
     ports:
       - "8181:8080"
     volumes:
-      - ./searxng/settings.yml:/etc/searxng/settings.yml:ro
+      - /root/server/searxng/settings.yml:/etc/searxng/settings.yml
     environment:
       - UWSGI_WORKERS=4
       - UWSGI_THREADS=4

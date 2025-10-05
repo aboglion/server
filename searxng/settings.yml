@@ -2,11 +2,21 @@ server:
   bind_address: "0.0.0.0"
   port: 8080
   base_url: ""
-  secret_key: "younisaboglion"
+  secret_key: "younis.aboglion"
 
   access_control:
     allow:
       - 0.0.0.0/0
+
+default_doi_resolver:
+  - crossref
+
+doi_resolver:
+  - crossref
+  - datacite
+  - opendoi
+  - aister
+  - medra
 
 search:
   formats:
@@ -14,7 +24,7 @@ search:
     - json
 
 engines:
-  google:
+  - name: google
     shortcut: g
     engine: google
     base_url: https://www.google.com/search
@@ -22,7 +32,7 @@ engines:
     params:
       q: '{{ query }}'
 
-  bing:
+  - name: bing
     shortcut: b
     engine: bing
     base_url: https://www.bing.com/search
@@ -30,7 +40,7 @@ engines:
     params:
       q: '{{ query }}'
 
-  duckduckgo:
+  - name: duckduckgo
     shortcut: d
     engine: duckduckgo
     base_url: https://duckduckgo.com/html/
@@ -43,7 +53,7 @@ logging:
   file: /var/log/searxng/searxng.log
 
 cache:
-  enabled: true
+  enabled: false
   expiration: 3600
 
 pagination:
