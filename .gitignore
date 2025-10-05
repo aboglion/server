@@ -9,3 +9,4 @@ n8n/data/*
 n8n/data/**/*
 # Ignore N8N data in home directory
 ~/n8n_data/
+n8n/database.sqlite
