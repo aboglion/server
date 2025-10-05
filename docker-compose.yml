@@ -23,13 +23,22 @@ services:
       - ../data_backup/n8n_data:/home/node/.n8n
     networks:
       - app_net
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    restart: unless-stopped
+    ports:
+      - "8181:8080"
+    networks:
+      - app_net
 
   caddy:
     image: caddy:latest
     container_name: caddy
     restart: unless-stopped
     ports:
-      - "8744:443"
+      - "80:80"
+      - "8744:443"  # תעדכן ל-443 במידת הצורך
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./caddy/ssl:/etc/caddy/ssl:ro
