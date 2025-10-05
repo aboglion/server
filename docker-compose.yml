@@ -62,23 +62,11 @@ services:
           memory: 128M
 
   searxng:
-    image: searxng/searxng:2025.10.1-06e4f4f75
+    image: docker.io/searxng/searxng:latest
     container_name: searxng
-    restart: unless-stopped
     ports:
-      - "8181:8080"
+      - "8888:8080"
     volumes:
-      - /root/server/searxng/settings.yml:/etc/searxng/settings.yml
-    environment:
-      - UWSGI_WORKERS=4
-      - UWSGI_THREADS=4
-    networks:
-      - app_net
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 256M
+      - ./config/:/etc/searxng/
+      - ./data/:/var/cache/searxng/
+    restart: unless-stopped
