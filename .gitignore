@@ -1,12 +1,9 @@
 __pycache__/
 *.pyc
 .env
-yolo11-env
-# SSL certificates
-n8n/ssl/*
-n8n/ssl/**/*
-n8n/data/*
-n8n/data/**/*
 # Ignore N8N data in home directory
-~/n8n_data/
-n8n/database.sqlite
+# 1. חסום את כל תיקיית הדאטה
+n8n_data/
+
+# 2. צור חריגה ואפשר רק את תיקיית ה-workflows
+!n8n_data/workflows/

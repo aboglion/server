@@ -18,7 +18,7 @@ services:
       - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
       - N8N_GIT_NODE_DISABLE_BARE_REPOS=true
     volumes:
-      - ../data_backup/n8n_data:/home/node/.n8n
+      - ./n8n_data:/home/node/.n8n
     networks:
       - app_net
     deploy:
@@ -34,8 +34,8 @@ services:
     image: docker.io/searxng/searxng:latest
     container_name: searxng
     volumes:
-      - ./searxng_config:/etc/searxng:rw
-      - ./searxng_cache:/var/cache/searxng:rw
+      - ./searxng/searxng_config:/etc/searxng:rw
+      - ./searxng/searxng_cache:/var/cache/searxng:rw
     environment:
       - SEARXNG_BASE_URL=https://aboglion.top/searx/
     restart: unless-stopped
@@ -48,6 +48,17 @@ services:
       - SETGID
       - SETUID
 
+  browserless:
+    image: ghcr.io/browserless/chromium
+    container_name: browserless
+    restart: unless-stopped
+    environment:
+      - CONCURRENT=10
+      - TOKEN=${BROWSERLESS_TOKEN} # <-- קורא את הערך מהקובץ .env
+    networks:
+      - app_net
+
+
   caddy:
     image: caddy:latest
     container_name: caddy
@@ -57,9 +68,9 @@ services:
       - "443:443"
       - "5000:5000"
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./caddy_data:/data
-      - ./caddy_config:/config
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy/caddy_data:/data
+      - ./caddy/caddy_config:/config
     depends_on:
       - n8n
       - searxng
