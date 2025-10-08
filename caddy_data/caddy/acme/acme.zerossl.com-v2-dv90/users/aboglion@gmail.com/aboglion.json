@@ -1,0 +1,14 @@
+{
+	"status": "valid",
+	"contact": [
+		"mailto:aboglion@gmail.com"
+	],
+	"termsOfServiceAgreed": true,
+	"externalAccountBinding": {
+		"protected": "eyJhbGciOiJIUzI1NiIsImtpZCI6IkhvYXF2TVhES0RaMWZKWkw4UFdKeEEiLCJ1cmwiOiJodHRwczovL2FjbWUuemVyb3NzbC5jb20vdjIvRFY5MC9uZXdBY2NvdW50In0",
+		"payload": "eyJjcnYiOiJQLTI1NiIsImt0eSI6IkVDIiwieCI6Inh2YVNpZ0NxZWdaWEpqSEppWFdGN2lRWHhmb3VGZm0tM0ZKeEt1M1NPX3MiLCJ5IjoiX3FXLVZLaGVjMDFvTE9jRldWeGFqdnJ0N2lGcHM5SHdzMnlhUzh2bU55ayJ9",
+		"signature": "-TlstkedkWBtYe1XMcWio7ctYZwkrIK5I3ZQC8V5At8"
+	},
+	"orders": "https://acme.zerossl.com/v2/DV90/account/HoaqvMXDKDZ1fJZL8PWJxA/orders",
+	"location": "https://acme.zerossl.com/v2/DV90/account/HoaqvMXDKDZ1fJZL8PWJxA"
+}

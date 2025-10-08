@@ -1,0 +1,52 @@
+use_default_settings: true
+
+general:
+  instance_name: "SearXNG"
+
+server:
+  bind_address: "0.0.0.0"
+  port: 8080
+  secret_key: "younis.aboglion.change.this.to.random.string"
+  base_url: "https://aboglion.top/searx/"
+  image_proxy: true
+
+ui:
+  static_use_hash: true
+  default_locale: "en"
+  theme_args:
+    simple_style: auto
+
+search:
+  safe_search: 0
+  autocomplete: "google"
+  default_lang: "en"
+  formats:
+    - html
+    - json
+
+enabled_plugins:
+  - 'Hash plugin'
+  - 'Self Information'
+  - 'Tracker URL remover'
+  - 'Ahmia blacklist'
+
+engines:
+  - name: google
+    engine: google
+    shortcut: go
+    disabled: false
+
+  - name: bing
+    engine: bing
+    shortcut: bi
+    disabled: false
+
+  - name: duckduckgo
+    engine: duckduckgo
+    shortcut: ddg
+    disabled: false
+
+  - name: wikipedia
+    engine: wikipedia
+    shortcut: wp
+    disabled: false

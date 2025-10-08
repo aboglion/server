@@ -1,0 +1,1 @@
+{"type":"http-01","url":"https://acme.zerossl.com/v2/DV90/chall/OCmCXnfN3S3gt5H4bX6Gng","status":"pending","token":"H27QZBf5oDh3tcX0cBrEOvLDYA4AYEhhkU7qp3PZEc0","keyAuthorization":"H27QZBf5oDh3tcX0cBrEOvLDYA4AYEhhkU7qp3PZEc0.iHFbOx_AaKgZ4jCnEQBx4tZ24dJRkQFYm7rxd_t6b9A","identifier":{"type":"dns","value":"n8n.aboglion.top"}}

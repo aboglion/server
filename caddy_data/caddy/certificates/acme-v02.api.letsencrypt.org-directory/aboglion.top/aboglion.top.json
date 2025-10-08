@@ -1,0 +1,19 @@
+{
+	"sans": [
+		"aboglion.top"
+	],
+	"issuer_data": {
+		"url": "https://acme-v02.api.letsencrypt.org/acme/cert/05b2b1309d4d2ee3f2a642c95d029ad7d81e",
+		"ca": "https://acme-v02.api.letsencrypt.org/directory",
+		"account": "https://acme-v02.api.letsencrypt.org/acme/acct/2710054431",
+		"renewal_info": {
+			"suggestedWindow": {
+				"start": "2025-12-05T17:32:14Z",
+				"end": "2025-12-07T12:43:03Z"
+			},
+			"_uniqueIdentifier": "jw0TovYuftFQbDMYOF1ZjiNykco.BbKxMJ1NLuPypkLJXQKa19ge",
+			"_retryAfter": "2025-10-08T16:07:11.483858795Z",
+			"_selectedTime": "2025-12-06T12:50:23Z"
+		}
+	}
+}

@@ -1,4 +1,35 @@
 aboglion.top {
-    reverse_proxy n8n:5678
+    handle /searx/* {
+        uri strip_prefix /searx
+        reverse_proxy searxng:8080 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Script-Name /searx
+        }
+    }
+
+    handle {
+        respond "Welcome! Visit https://aboglion.top:5000 for n8n or /searx/" 200
+    }
+
     tls aboglion@gmail.com
+
+    log {
+        output file /data/access.log
+        format json
+    }
+}
+
+aboglion.top:5000 {
+    reverse_proxy n8n:5678 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+    }
+
+    tls aboglion@gmail.com
+
+    log {
+        output file /data/n8n-access.log
+        format json
+    }
 }
