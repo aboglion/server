@@ -1,0 +1,8 @@
+[limiter]
+enabled = true
+
+[[rules]]
+period = "1 second"
+limit = 2
+burst = 2
+action = "deny"

@@ -7,3 +7,31 @@ n8n_data/
 
 # 2. צור חריגה ואפשר רק את תיקיית ה-workflows
 !n8n_data/workflows/
+
+# SearxNG cache and config
+searxng/searxng_cache/
+
+# Docker Compose override files
+docker-compose.override.yml
+
+# Postgres and Redis data directories
+postgres_data/
+redis_data/
+
+# Caddy data and config
+caddy/caddy_data/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE/editor settings
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates

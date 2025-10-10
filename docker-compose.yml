@@ -3,61 +3,71 @@ networks:
     driver: bridge
 
 services:
+  firecrawl-postgres:
+    image: postgres:15
+    container_name: firecrawl-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: firecrawl
+      POSTGRES_USER: firecrawl
+      POSTGRES_PASSWORD: firecrawl123
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    networks:
+      - app_net
+
+  firecrawl-redis:
+    image: redis:7-alpine
+    container_name: firecrawl-redis
+    restart: unless-stopped
+    volumes:
+      - ./redis_data:/data
+    networks:
+      - app_net
+
+  firecrawl:
+    image: ghcr.io/firecrawl/firecrawl:2.0.0
+    container_name: firecrawl
+    restart: unless-stopped
+    environment:
+      PORT: 3001
+      DATABASE_URL: postgres://firecrawl:firecrawl123@firecrawl-postgres:5432/firecrawl
+      REDIS_URL: redis://firecrawl-redis:6379
+      API_KEY: ${FIRECRAWL_API_KEY}
+    ports:
+      - "3001:3001"
+    depends_on:
+      - firecrawl-postgres
+      - firecrawl-redis
+    networks:
+      - app_net
+
   n8n:
     image: n8nio/n8n:latest
     container_name: n8n
     restart: unless-stopped
     environment:
-      - N8N_HOST=aboglion.top
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=https
-      - WEBHOOK_URL=https://aboglion.top:5000/
-      - NODE_ENV=production
-      - DB_SQLITE_POOL_SIZE=3
-      - N8N_RUNNERS_ENABLED=true
-      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
-      - N8N_GIT_NODE_DISABLE_BARE_REPOS=true
+      N8N_HOST: aboglion.top
+      N8N_PORT: 5678
+      N8N_PROTOCOL: https
+      WEBHOOK_URL: https://aboglion.top:5000/
+      DB_SQLITE_POOL_SIZE: 3
     volumes:
       - ./n8n_data:/home/node/.n8n
     networks:
       - app_net
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 1024M
-        reservations:
-          cpus: '0.5'
-          memory: 512M
 
   searxng:
-    image: docker.io/searxng/searxng:latest
+    image: searxng/searxng:latest
     container_name: searxng
+    restart: unless-stopped
+    networks:
+      - app_net
     volumes:
-      - ./searxng/searxng_config:/etc/searxng:rw
+      - ./searxng/searxng_config:/etc/searxng:ro
       - ./searxng/searxng_cache:/var/cache/searxng:rw
     environment:
-      - SEARXNG_BASE_URL=https://aboglion.top/searx/
-    restart: unless-stopped
-    networks:
-      - app_net
-    cap_drop:
-      - ALL
-    cap_add:
-      - CHOWN
-      - SETGID
-      - SETUID
-
-  browserless:
-    image: ghcr.io/browserless/chromium
-    container_name: browserless
-    restart: unless-stopped
-    environment:
-      - CONCURRENT=10
-      - TOKEN=${BROWSERLESS_TOKEN} # <-- קורא את הערך מהקובץ .env
-    networks:
-      - app_net
-
+      SEARXNG_BASE_URL: https://aboglion.top/searx/
 
   caddy:
     image: caddy:latest
@@ -74,13 +84,6 @@ services:
     depends_on:
       - n8n
       - searxng
+      - firecrawl
     networks:
       - app_net
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 256M
-        reservations:
-          cpus: '0.25'
-          memory: 128M
